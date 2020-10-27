@@ -52,8 +52,11 @@ def as_train_method(func: Callable) -> Callable:
     @wraps(func)
     def arg_wrapper(self, *args, **kwargs):
         if self.is_trained:
-            self.logger.warning('"%s" has been trained already, '
-                                'training it again will override the previous training' % self.__class__.__name__)
+            self.logger.warning(
+                '"%s" has been trained already, '
+                'training it again will override the previous training'
+                % self.__class__.__name__
+            )
         f = func(self, *args, **kwargs)
         self.is_trained = True
         return f
@@ -83,7 +86,7 @@ def as_ndarray(func: Callable, dtype=np.float32) -> Callable:
 
 def require_train(func: Callable) -> Callable:
     """Mark an :class:`BaseExecutor` function as training required, so it can only be called
-    after the function decorated by ``@as_train_method``. """
+    after the function decorated by ``@as_train_method``."""
 
     @wraps(func)
     def arg_wrapper(self, *args, **kwargs):
@@ -91,7 +94,9 @@ def require_train(func: Callable) -> Callable:
             if self.is_trained:
                 return func(self, *args, **kwargs)
             else:
-                raise RuntimeError(f'training is required before calling "{func.__name__}"')
+                raise RuntimeError(
+                    f'training is required before calling "{func.__name__}"'
+                )
         else:
             raise AttributeError(f'{self!r} has no attribute "is_trained"')
 
@@ -104,7 +109,9 @@ def store_init_kwargs(func: Callable) -> Callable:
     @wraps(func)
     def arg_wrapper(self, *args, **kwargs):
         if func.__name__ != '__init__':
-            raise TypeError('this decorator should only be used on __init__ method of an executor')
+            raise TypeError(
+                'this decorator should only be used on __init__ method of an executor'
+            )
         taboo = {'self', 'args', 'kwargs'}
         _defaults = get_default_metas()
         taboo.update(_defaults.keys())
@@ -120,8 +127,10 @@ def store_init_kwargs(func: Callable) -> Callable:
                 tmp[k] = v
 
         if getattr(self, 'store_args_kwargs', None):
-            if args: tmp['args'] = args
-            if kwargs: tmp['kwargs'] = {k: v for k, v in kwargs.items() if k not in taboo}
+            if args:
+                tmp['args'] = args
+            if kwargs:
+                tmp['kwargs'] = {k: v for k, v in kwargs.items() if k not in taboo}
 
         if hasattr(self, '_init_kwargs_dict'):
             self._init_kwargs_dict.update(tmp)
@@ -133,14 +142,17 @@ def store_init_kwargs(func: Callable) -> Callable:
     return arg_wrapper
 
 
-def batching(func: Callable[[Any], np.ndarray] = None, *,
-             batch_size: Union[int, Callable] = None,
-             num_batch: Optional[int] = None,
-             split_over_axis: int = 0,
-             merge_over_axis: int = 0,
-             slice_on: int = 1,
-             label_on: Optional[int] = None,
-             ordinal_idx_arg: Optional[int] = None) -> Any:
+def batching(
+    func: Callable[[Any], np.ndarray] = None,
+    *,
+    batch_size: Union[int, Callable] = None,
+    num_batch: Optional[int] = None,
+    split_over_axis: int = 0,
+    merge_over_axis: int = 0,
+    slice_on: int = 1,
+    label_on: Optional[int] = None,
+    ordinal_idx_arg: Optional[int] = None,
+) -> Any:
     """Split the input of a function into small batches and call :func:`func` on each batch
     , collect the merged result and return. This is useful when the input is too big to fit into memory
 
@@ -180,14 +192,17 @@ def batching(func: Callable[[Any], np.ndarray] = None, *,
             data = args[slice_on]
             args = list(args)
 
-            b_size = (batch_size(data) if callable(batch_size) else batch_size) or getattr(args[0], 'batch_size', None)
+            b_size = (
+                batch_size(data) if callable(batch_size) else batch_size
+            ) or getattr(args[0], 'batch_size', None)
             # no batching if b_size is None
             if b_size is None:
                 return func(*args, **kwargs)
 
             default_logger.info(
                 f'batching enabled for {func.__qualname__} batch_size={b_size} '
-                f'num_batch={num_batch} axis={split_over_axis}')
+                f'num_batch={num_batch} axis={split_over_axis}'
+            )
 
             full_data_size = _get_size(data, split_over_axis)
             batched_data_size = b_size * num_batch if num_batch else None
@@ -204,10 +219,14 @@ def batching(func: Callable[[Any], np.ndarray] = None, *,
             yield_slice = isinstance(data, np.memmap)
             slice_idx = None
 
-            for b in batch_iterator(data[:total_size], b_size, split_over_axis, yield_slice=yield_slice):
+            for b in batch_iterator(
+                data[:total_size], b_size, split_over_axis, yield_slice=yield_slice
+            ):
                 if yield_slice:
                     slice_idx = b
-                    new_memmap = np.memmap(data.filename, dtype=data.dtype, mode='r', shape=data.shape)
+                    new_memmap = np.memmap(
+                        data.filename, dtype=data.dtype, mode='r', shape=data.shape
+                    )
                     b = new_memmap[slice_idx]
                     slice_idx = slice_idx[split_over_axis]
                     if slice_idx.start is None or slice_idx.stop is None:
@@ -241,7 +260,11 @@ def batching(func: Callable[[Any], np.ndarray] = None, *,
                     reduced_result = []
                     num_cols = len(final_result[0])
                     for col in range(num_cols):
-                        reduced_result.append(np.concatenate([row[col] for row in final_result], merge_over_axis))
+                        reduced_result.append(
+                            np.concatenate(
+                                [row[col] for row in final_result], merge_over_axis
+                            )
+                        )
                     final_result = tuple(reduced_result)
 
             if len(final_result):

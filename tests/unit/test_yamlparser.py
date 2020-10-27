@@ -72,8 +72,12 @@ def test_class_yaml():
     a = yaml.load('!DummyClass {}')
     assert type(a) == DummyClass
 
-    with open(resource_filename('jina',
-                                '/'.join(('resources', 'executors.requests.%s.yml' % 'BaseExecutor')))) as fp:
+    with open(
+        resource_filename(
+            'jina',
+            '/'.join(('resources', 'executors.requests.%s.yml' % 'BaseExecutor')),
+        )
+    ) as fp:
         b = fp.read()
         print(b)
         c = yaml.load(b)
@@ -85,6 +89,7 @@ def test_class_yaml():
         pass
 
     from jina.executors.requests import _defaults
+
     assert _defaults is not None
 
 

@@ -23,8 +23,10 @@ def _load_local_hub_manifest():
     try:
         path = os.path.dirname(pkgutil.get_loader(namespace).path)
     except AttributeError:
-        default_logger.warning('local Hub is not initialized, '
-                               'try "git submodule update --init" if you are in dev mode')
+        default_logger.warning(
+            'local Hub is not initialized, '
+            'try "git submodule update --init" if you are in dev mode'
+        )
         return {}
 
     def add_hub():
@@ -67,9 +69,14 @@ def _list_local(logger) -> Optional[Dict[str, Any]]:
     return manifests
 
 
-def _list(logger, image_name: str = None, image_kind: str = None,
-          image_type: str = None, image_keywords: Sequence = ()) -> Optional[Dict[str, Any]]:
-    """ Use Hub api to get the list of filtered images
+def _list(
+    logger,
+    image_name: str = None,
+    image_kind: str = None,
+    image_type: str = None,
+    image_keywords: Sequence = (),
+) -> Optional[Dict[str, Any]]:
+    """Use Hub api to get the list of filtered images
 
     :param logger: logger to use
     :param image_name:
@@ -87,7 +94,7 @@ def _list(logger, image_name: str = None, image_kind: str = None,
         'name': image_name,
         'kind': image_kind,
         'type': image_type,
-        'keywords': ','.join(image_keywords) if image_keywords else None
+        'keywords': ','.join(image_keywords) if image_keywords else None,
     }
     params = {k: v for k, v in params.items() if v}
     if params:
@@ -99,7 +106,9 @@ def _list(logger, image_name: str = None, image_kind: str = None,
                     response = json.load(resp)
             except HTTPError as err:
                 if err.code == 400:
-                    logger.warning('no matched executors found. please use different filters and retry.')
+                    logger.warning(
+                        'no matched executors found. please use different filters and retry.'
+                    )
                 elif err.code == 500:
                     logger.error(f'server is down: {err.reason}')
                 else:
@@ -117,11 +126,15 @@ def _list(logger, image_name: str = None, image_kind: str = None,
 
 
 def _make_hub_table_with_local(manifests, local_manifests):
-    info_table = [f'found {len(manifests)} matched hub images',
-                  '{:<50s}{:<20s}{:<20s}{:<30s}'.format(colored('Name', attrs=_header_attrs),
-                                                        colored('Version', attrs=_header_attrs),
-                                                        colored('Local', attrs=_header_attrs),
-                                                        colored('Description', attrs=_header_attrs))]
+    info_table = [
+        f'found {len(manifests)} matched hub images',
+        '{:<50s}{:<20s}{:<20s}{:<30s}'.format(
+            colored('Name', attrs=_header_attrs),
+            colored('Version', attrs=_header_attrs),
+            colored('Local', attrs=_header_attrs),
+            colored('Description', attrs=_header_attrs),
+        ),
+    ]
     for index, manifest in enumerate(manifests):
         image_name = manifest.get('name', '')
         ver = manifest.get('version', '')
@@ -138,26 +151,34 @@ def _make_hub_table_with_local(manifests, local_manifests):
                     color = 'green'
                 else:
                     color = 'yellow'
-            info_table.append(f'{colored(image_name, color="yellow", attrs="bold"):<50s}'
-                              f'{colored(ver, color="green"):<20s}'
-                              f'{colored(local_ver, color=color):<20s}'
-                              f'{desc:<30s}')
+            info_table.append(
+                f'{colored(image_name, color="yellow", attrs="bold"):<50s}'
+                f'{colored(ver, color="green"):<20s}'
+                f'{colored(local_ver, color=color):<20s}'
+                f'{desc:<30s}'
+            )
     return info_table
 
 
 def _make_hub_table(manifests):
-    info_table = [f'found {len(manifests)} matched hub images',
-                  '{:<50s}{:<20s}{:<30s}'.format(colored('Name', attrs=_header_attrs),
-                                                 colored('Version', attrs=_header_attrs),
-                                                 colored('Description', attrs=_header_attrs))]
+    info_table = [
+        f'found {len(manifests)} matched hub images',
+        '{:<50s}{:<20s}{:<30s}'.format(
+            colored('Name', attrs=_header_attrs),
+            colored('Version', attrs=_header_attrs),
+            colored('Description', attrs=_header_attrs),
+        ),
+    ]
     for index, manifest in enumerate(manifests):
         image_name = manifest.get('name', '')
         ver = manifest.get('version', '')
         desc = manifest.get('description', '')[:60].strip() + '...'
         if image_name and ver and desc:
-            info_table.append(f'{colored(image_name, color="yellow", attrs="bold"):<50s}'
-                              f'{colored(ver, color="green"):<20s}'
-                              f'{desc:<30s}')
+            info_table.append(
+                f'{colored(image_name, color="yellow", attrs="bold"):<50s}'
+                f'{colored(ver, color="green"):<20s}'
+                f'{desc:<30s}'
+            )
     return info_table
 
 
@@ -173,7 +194,9 @@ def _push(logger, summary: Dict = None):
     hubapi_url = hubapi_yml['hubapi']['url'] + hubapi_yml['hubapi']['push']
 
     if not credentials_file().is_file():
-        logger.error(f'user hasnot logged in. please login using command: {colored("jina hub login", attrs=["bold"])}')
+        logger.error(
+            f'user hasnot logged in. please login using command: {colored("jina hub login", attrs=["bold"])}'
+        )
         return
 
     with open(credentials_file(), 'r') as cf:
@@ -181,27 +204,31 @@ def _push(logger, summary: Dict = None):
     access_token = cred_yml['access_token']
 
     if not access_token:
-        logger.error(f'user hasnot logged in. please login using command: {colored("jina hub login", attrs=["bold"])}')
+        logger.error(
+            f'user hasnot logged in. please login using command: {colored("jina hub login", attrs=["bold"])}'
+        )
         return
 
-    headers = {
-        'Accept': 'application/json',
-        'authorizationToken': access_token
-    }
+    headers = {'Accept': 'application/json', 'authorizationToken': access_token}
     try:
         import requests
-        response = requests.post(url=f'{hubapi_url}',
-                                 headers=headers,
-                                 data=json.dumps(summary))
+
+        response = requests.post(
+            url=f'{hubapi_url}', headers=headers, data=json.dumps(summary)
+        )
         if response.status_code == requests.codes.ok:
             logger.info(response.text)
         elif response.status_code == requests.codes.unauthorized:
-            logger.error(f'user is unauthorized to perform push operation. '
-                         f'please login using command: {colored("jina hub login", attrs=["bold"])}')
+            logger.error(
+                f'user is unauthorized to perform push operation. '
+                f'please login using command: {colored("jina hub login", attrs=["bold"])}'
+            )
         elif response.status_code == requests.codes.internal_server_error:
             if 'auth' in response.text.lower():
-                logger.error(f'authentication issues!'
-                             f'please login using command: {colored("jina hub login", attrs=["bold"])}')
+                logger.error(
+                    f'authentication issues!'
+                    f'please login using command: {colored("jina hub login", attrs=["bold"])}'
+                )
             logger.error(f'got an error from the API: {response.text}')
     except Exception as exp:
         logger.error(f'got an exception while invoking hubapi for push {repr(exp)}')

@@ -4,9 +4,8 @@ import pytest
 
 from jina.docker.helper import credentials_file, handle_dot_in_keys, Waiter
 
-@pytest.mark.parametrize(
-    'seconds, expected', [(0, True), (10, False)]
-)
+
+@pytest.mark.parametrize('seconds, expected', [(0, True), (10, False)])
 def test_waiter(seconds, expected):
     with Waiter(seconds=seconds) as waiter:
         waiter.sleep(1)
@@ -24,7 +23,7 @@ def test_credentials_file():
         ({'.doc1': 'content'}, {'_doc1': 'content'}),
         ({'doc1': {'.doc1': 'content'}}, {'doc1': {'_doc1': 'content'}}),
         ({'doc1': [{'.doc1': 'content'}]}, {'doc1': [{'_doc1': 'content'}]}),
-    ]
+    ],
 )
 def test_handle_dot_in_keys(document, expected):
     assert handle_dot_in_keys(document) == expected

@@ -21,9 +21,12 @@ def test_bad_flow():
         assert req.status.code == jina_pb2.Status.ERROR
         assert req.status.details[0].pod == 'r1'
 
-    f = (Flow().add(name='r1', uses='!BaseCrafter')
-         .add(name='r2', uses='!BaseEncoder')
-         .add(name='r3', uses='!BaseEncoder'))
+    f = (
+        Flow()
+        .add(name='r1', uses='!BaseCrafter')
+        .add(name='r2', uses='!BaseEncoder')
+        .add(name='r3', uses='!BaseEncoder')
+    )
 
     # always test two times, make sure the flow still works after it fails on the first
     with f:
@@ -37,9 +40,12 @@ def test_bad_flow_customized():
         assert req.status.details[0].pod == 'r2'
         assert req.status.details[0].exception.startswith('ZeroDivisionError')
 
-    f = (Flow().add(name='r1', uses='_pass')
-         .add(name='r2', uses='!DummyCrafter')
-         .add(name='r3', uses='!BaseEncoder'))
+    f = (
+        Flow()
+        .add(name='r1', uses='_pass')
+        .add(name='r2', uses='!DummyCrafter')
+        .add(name='r3', uses='!BaseEncoder')
+    )
 
     with f:
         f.dry_run()
@@ -59,9 +65,12 @@ def test_except_with_parallel():
         assert req.status.details[0].exception.startswith('ZeroDivisionError')
         assert req.status.details[1].exception.startswith('NotImplementedError')
 
-    f = (Flow().add(name='r1', uses='_pass')
-         .add(name='r2', uses='!DummyCrafter', parallel=3)
-         .add(name='r3', uses='!BaseEncoder'))
+    f = (
+        Flow()
+        .add(name='r1', uses='_pass')
+        .add(name='r2', uses='!DummyCrafter', parallel=3)
+        .add(name='r3', uses='!BaseEncoder')
+    )
 
     with f:
         f.dry_run()

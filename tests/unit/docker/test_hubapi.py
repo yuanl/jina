@@ -18,16 +18,11 @@ sample_manifest = {
             "vendor": "Jina AI Limited",
             "license": "apache-2.0",
             "avatar": None,
-            "platform": [
-                "linux/amd64"
-            ],
-            "keywords": [
-                "toy",
-                "example"
-            ],
+            "platform": ["linux/amd64"],
+            "keywords": ["toy", "example"],
             "manifest_version": 1,
             "update": "nightly",
-            "kind": "encoder"
+            "kind": "encoder",
         }
     ]
 }
@@ -35,12 +30,16 @@ sample_manifest = {
 
 @mock.patch('jina.docker.hubapi.urlopen')
 def test_hubapi_list(mocker):
-    mocker.return_value.__enter__.return_value.read.return_value = json.dumps(sample_manifest)
-    result = _list(logger=getLogger(),
-                   image_name='Dummy MWU Encoder',
-                   image_kind='encoder',
-                   image_type='pod',
-                   image_keywords=['toy'])
+    mocker.return_value.__enter__.return_value.read.return_value = json.dumps(
+        sample_manifest
+    )
+    result = _list(
+        logger=getLogger(),
+        image_name='Dummy MWU Encoder',
+        image_kind='encoder',
+        image_type='pod',
+        image_keywords=['toy'],
+    )
 
     mocker.assert_called_once()
     assert result[0]['name'] == 'Dummy MWU Encoder'

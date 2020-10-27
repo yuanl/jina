@@ -15,16 +15,16 @@ cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class MockSegmenterReduce(BaseSegmenter):
-
     def craft(self, text: str, *args, **kwargs) -> List[Dict]:
         split = text.split(',')
-        chunks = [dict(text=split[0], offset=0, weight=1.0, modality='mode1'),
-                  dict(text=split[1], offset=1, weight=1.0, modality='mode2')]
+        chunks = [
+            dict(text=split[0], offset=0, weight=1.0, modality='mode1'),
+            dict(text=split[1], offset=1, weight=1.0, modality='mode2'),
+        ]
         return chunks
 
 
 class MockEncoderReduce(BaseEncoder):
-
     def encode(self, data: str, *args, **kwargs) -> 'np.ndarray':
         output = []
         for r in data:
@@ -53,14 +53,25 @@ def test_merge_chunks_with_different_modality():
             assert doc.chunks[0].modality in ['mode1', 'mode2']
             assert doc.chunks[1].modality in ['mode1', 'mode2']
 
-    flow = Flow().add(name='crafter', uses='MockSegmenterReduce'). \
-        add(name='encoder1', uses=os.path.join(cur_dir, 'yaml/mockencoder-mode1.yml')). \
-        add(name='encoder2', uses=os.path.join(cur_dir, 'yaml/mockencoder-mode2.yml'), needs=['crafter']). \
-        add(name='reducer', uses='- !ReduceAllDriver | {traversal_paths: [c]}',
-            needs=['encoder1', 'encoder2'])
+    flow = (
+        Flow()
+        .add(name='crafter', uses='MockSegmenterReduce')
+        .add(name='encoder1', uses=os.path.join(cur_dir, 'yaml/mockencoder-mode1.yml'))
+        .add(
+            name='encoder2',
+            uses=os.path.join(cur_dir, 'yaml/mockencoder-mode2.yml'),
+            needs=['crafter'],
+        )
+        .add(
+            name='reducer',
+            uses='- !ReduceAllDriver | {traversal_paths: [c]}',
+            needs=['encoder1', 'encoder2'],
+        )
+    )
 
     with flow:
         flow.index(input_fn=input_fn, output_fn=validate)
+
 
 def get_prev_reqs():
     # three requests, each with the SAME doc, but diff evaluations
@@ -75,10 +86,11 @@ def get_prev_reqs():
         result.append(r.index)
     return result
 
+
 prev_reqs = get_prev_reqs()
 
-class MockCollectEvalDriver(CollectEvaluationDriver):
 
+class MockCollectEvalDriver(CollectEvaluationDriver):
     @property
     def exec_fn(self):
         return self._exec_fn
@@ -107,4 +119,3 @@ def test_collect_evals():
     assert len(driver.prev_reqs[0].docs[0].evaluations) == 1
     assert len(driver.prev_reqs[1].docs[0].evaluations) == 1
     assert len(driver.prev_reqs[2].docs[0].evaluations) == 3
-

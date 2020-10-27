@@ -2,12 +2,14 @@ import os
 import pytest
 
 from jina.executors import BaseExecutor
+
 # BaseIndexer is already registered
 from jina.helper import yaml
 
 
 def test_exec_type(tmpdir):
     from jina.executors.indexers import BaseIndexer
+
     assert 'BaseIndexer' in BaseExecutor._registered_class
 
     # init from YAML should be okay as well
@@ -26,7 +28,6 @@ def test_exec_type(tmpdir):
 
     # we override BaseIndexer now, without force it shall not store all init values
     class BaseIndexer(BaseExecutor):
-
         def __init__(self, a=0):
             super().__init__()
             self.a = a

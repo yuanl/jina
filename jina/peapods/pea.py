@@ -18,8 +18,14 @@ from .zmq import send_ctrl_message, Zmqlet, ZmqStreamlet
 from .. import __ready_msg__, __stop_msg__
 from ..drivers.helper import routes2str, add_route
 from ..enums import PeaRoleType, OnErrorSkip
-from ..excepts import NoExplicitMessage, ExecutorFailToLoad, MemoryOverHighWatermark, DriverError, PeaFailToStart, \
-    PretrainedModelFileDoesNotExist
+from ..excepts import (
+    NoExplicitMessage,
+    ExecutorFailToLoad,
+    MemoryOverHighWatermark,
+    DriverError,
+    PeaFailToStart,
+    PretrainedModelFileDoesNotExist,
+)
 from ..executors import BaseExecutor
 from ..helper import is_valid_local_config_source
 from ..logging import JinaLogger
@@ -32,14 +38,14 @@ __all__ = ['PeaMeta', 'BasePea']
 
 class PeaMeta(type):
     """Meta class of :class:`BasePea` to enable switching between ``thread`` and ``process`` backend. """
+
     _dct = {}
 
     def __new__(cls, name, bases, dct):
         _cls = super().__new__(cls, name, bases, dct)
-        PeaMeta._dct.update({name: {'cls': cls,
-                                    'name': name,
-                                    'bases': bases,
-                                    'dct': dct}})
+        PeaMeta._dct.update(
+            {name: {'cls': cls, 'name': name, 'bases': bases, 'dct': dct}}
+        )
         return _cls
 
     def __call__(cls, *args, **kwargs) -> 'PeaMeta':
@@ -105,7 +111,7 @@ class BasePea(metaclass=PeaMeta):
     """
 
     def __init__(self, args: Union['argparse.Namespace', Dict]):
-        """ Create a new :class:`BasePea` object
+        """Create a new :class:`BasePea` object
 
         :param args: the arguments received from the CLI
         :param pea_id: the id used to separate the storage of each pea, only used when ``args.separate_storage=True``
@@ -156,7 +162,10 @@ class BasePea(metaclass=PeaMeta):
 
         :param msg: the message received
         """
-        if msg.envelope.status.code != jina_pb2.Status.ERROR or self.args.skip_on_error < OnErrorSkip.HANDLE:
+        if (
+            msg.envelope.status.code != jina_pb2.Status.ERROR
+            or self.args.skip_on_error < OnErrorSkip.HANDLE
+        ):
             self.executor(self.request_type)
         return self
 
@@ -183,6 +192,7 @@ class BasePea(metaclass=PeaMeta):
     def log_iterator(self):
         """Get the last log using iterator """
         from ..logging.queue import __log_queue__
+
         while self.is_ready.is_set():
             try:
                 yield __log_queue__.get_nowait()
@@ -190,14 +200,16 @@ class BasePea(metaclass=PeaMeta):
                 pass
 
     def load_executor(self):
-        """Load the executor to this BasePea, specified by ``uses`` CLI argument.
-
-        """
+        """Load the executor to this BasePea, specified by ``uses`` CLI argument."""
         if self.args.uses:
             try:
                 self.executor = BaseExecutor.load_config(
-                    self.args.uses if is_valid_local_config_source(self.args.uses) else self.args.uses_internal,
-                    self.args.separated_workspace, self.args.pea_id)
+                    self.args.uses
+                    if is_valid_local_config_source(self.args.uses)
+                    else self.args.uses_internal,
+                    self.args.separated_workspace,
+                    self.args.pea_id,
+                )
                 self.executor.attach(pea=self)
             except FileNotFoundError:
                 raise ExecutorFailToLoad
@@ -205,12 +217,18 @@ class BasePea(metaclass=PeaMeta):
                 self.is_pretrained_model_exception.set()
                 raise exception
         else:
-            self.logger.warning('this BasePea has no executor attached, you may want to double-check '
-                                'if it is a mistake or on purpose (using this BasePea as router/map-reduce)')
+            self.logger.warning(
+                'this BasePea has no executor attached, you may want to double-check '
+                'if it is a mistake or on purpose (using this BasePea as router/map-reduce)'
+            )
 
     def print_stats(self):
         self.logger.info(
-            ' '.join('%s: %.2f' % (k, v / self._timer.accum_time['loop']) for k, v in self._timer.accum_time.items()))
+            ' '.join(
+                '%s: %.2f' % (k, v / self._timer.accum_time['loop'])
+                for k, v in self._timer.accum_time.items()
+            )
+        )
 
     def save_executor(self, dump_interval: int = 0):
         """Save the contained executor
@@ -218,14 +236,20 @@ class BasePea(metaclass=PeaMeta):
         :param dump_interval: the time interval for saving
         """
 
-        if ((time.perf_counter() - self.last_dump_time) > self.args.dump_interval > 0) or dump_interval <= 0:
+        if (
+            (time.perf_counter() - self.last_dump_time) > self.args.dump_interval > 0
+        ) or dump_interval <= 0:
             if self.args.read_only:
-                self.logger.debug('executor is not saved as "read_only" is set to true for this BasePea')
+                self.logger.debug(
+                    'executor is not saved as "read_only" is set to true for this BasePea'
+                )
             elif not hasattr(self, 'executor'):
                 self.logger.debug('this BasePea contains no executor, no need to save')
             elif self.executor.save():
-                self.logger.info('dumped changes to the executor, %3.0fs since last the save'
-                                 % (time.perf_counter() - self.last_dump_time))
+                self.logger.info(
+                    'dumped changes to the executor, %3.0fs since last the save'
+                    % (time.perf_counter() - self.last_dump_time)
+                )
             else:
                 self.logger.info('executor says there is nothing to save')
             self.last_dump_time = time.perf_counter()
@@ -235,7 +259,9 @@ class BasePea(metaclass=PeaMeta):
     def pre_hook(self, msg: 'jina_pb2.Message') -> 'BasePea':
         """Pre-hook function, what to do after first receiving the message """
         msg_type = msg.request.WhichOneof('body')
-        self.logger.info(f'received "{msg_type}" from {routes2str(msg, flag_current=True)}')
+        self.logger.info(
+            f'received "{msg_type}" from {routes2str(msg, flag_current=True)}'
+        )
         add_route(msg.envelope, self.name, self.args.identity)
         self._request = getattr(msg.request, msg_type)
         self._message = msg
@@ -262,7 +288,10 @@ class BasePea(metaclass=PeaMeta):
         self.logger.success(__stop_msg__)
 
     def _callback(self, msg):
-        if msg.envelope.status.code != jina_pb2.Status.ERROR or self.args.skip_on_error < OnErrorSkip.CALLBACK:
+        if (
+            msg.envelope.status.code != jina_pb2.Status.ERROR
+            or self.args.skip_on_error < OnErrorSkip.CALLBACK
+        ):
             self.pre_hook(msg).handle(msg).post_hook(msg)
         return msg
 
@@ -296,7 +325,8 @@ class BasePea(metaclass=PeaMeta):
             self._handle_terminate_signal(msg)
         except MemoryOverHighWatermark:
             self.logger.critical(
-                f'memory usage {used_memory()} GB is above the high-watermark: {self.args.memory_hwm} GB')
+                f'memory usage {used_memory()} GB is above the high-watermark: {self.args.memory_hwm} GB'
+            )
         except NoExplicitMessage:
             # silent and do not propagate message anymore
             # 1. wait partial message to be finished
@@ -334,6 +364,7 @@ class BasePea(metaclass=PeaMeta):
     def load_plugins(self):
         if self.args.py_modules:
             from ..helper import PathImporter
+
             PathImporter.add_modules(*self.args.py_modules)
 
     def loop_teardown(self):
@@ -347,7 +378,9 @@ class BasePea(metaclass=PeaMeta):
             self.post_init()
             self.loop_body()
         except ExecutorFailToLoad:
-            self.logger.critical(f'can not start a executor from {self.args.uses}', exc_info=True)
+            self.logger.critical(
+                f'can not start a executor from {self.args.uses}', exc_info=True
+            )
         except KeyboardInterrupt:
             self.logger.info('Loop interrupted by user')
         except SystemError as ex:
@@ -385,15 +418,21 @@ class BasePea(metaclass=PeaMeta):
     def send_terminate_signal(self) -> None:
         """Gracefully close this pea and release all resources """
         if self.is_ready.is_set() and hasattr(self, 'ctrl_addr'):
-            return send_ctrl_message(self.ctrl_addr, jina_pb2.Request.ControlRequest.TERMINATE,
-                                     timeout=self.args.timeout_ctrl)
+            return send_ctrl_message(
+                self.ctrl_addr,
+                jina_pb2.Request.ControlRequest.TERMINATE,
+                timeout=self.args.timeout_ctrl,
+            )
 
     @property
     def status(self):
         """Send the control signal ``STATUS`` to itself and return the status """
         if self.is_ready.is_set() and getattr(self, 'ctrl_addr'):
-            return send_ctrl_message(self.ctrl_addr, jina_pb2.Request.ControlRequest.STATUS,
-                                     timeout=self.args.timeout_ctrl)
+            return send_ctrl_message(
+                self.ctrl_addr,
+                jina_pb2.Request.ControlRequest.STATUS,
+                timeout=self.args.timeout_ctrl,
+            )
 
     def start(self) -> 'BasePea':
         super().start()
@@ -410,8 +449,10 @@ class BasePea(metaclass=PeaMeta):
         if self.ready_or_shutdown.wait(_timeout):
             if self.is_shutdown.is_set():
                 # return too early and the shutdown is set, means something fails!!
-                self.logger.critical(f'fail to start {self.__class__} with name {self.name}, '
-                                     f'this often means the executor used in the pod is not valid')
+                self.logger.critical(
+                    f'fail to start {self.__class__} with name {self.name}, '
+                    f'this often means the executor used in the pod is not valid'
+                )
                 if self.is_pretrained_model_exception.is_set():
                     raise PretrainedModelFileDoesNotExist
                 else:
@@ -419,7 +460,8 @@ class BasePea(metaclass=PeaMeta):
             return self
         else:
             raise TimeoutError(
-                f'{self.__class__} with name {self.name} can not be initialized after {_timeout * 1e3}ms')
+                f'{self.__class__} with name {self.name} can not be initialized after {_timeout * 1e3}ms'
+            )
 
     def __enter__(self) -> 'BasePea':
         return self.start()

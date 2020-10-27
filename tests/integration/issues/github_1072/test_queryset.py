@@ -26,14 +26,15 @@ def test_queryset_with_struct(random_workspace):
         doc.tags['label'] = f'label{doc_id%2 + 1}'
         docs.append(doc)
 
-    f = (Flow()
-         .add(uses='- !FilterQL | {lookups: {tags__label__in: [label1, label2]}, traversal_paths: [r]}'))
+    f = Flow().add(
+        uses='- !FilterQL | {lookups: {tags__label__in: [label1, label2]}, traversal_paths: [r]}'
+    )
 
     def validate_all_docs(resp):
         assert len(resp.docs) == total_docs
 
     def validate_label2_docs(resp):
-        assert len(resp.docs) == total_docs/2
+        assert len(resp.docs) == total_docs / 2
 
     with f:
         # keep all the docs
@@ -43,6 +44,6 @@ def test_queryset_with_struct(random_workspace):
         qs = jina_pb2.QueryLang(name='FilterQL', priority=1)
         qs.parameters['lookups'] = {'tags__label': 'label2'}
         qs.parameters['traversal_paths'] = ['r']
-        f.index(docs, queryset=qs, output_fn=validate_label2_docs, callback_on_body=True)
-
-
+        f.index(
+            docs, queryset=qs, output_fn=validate_label2_docs, callback_on_body=True
+        )

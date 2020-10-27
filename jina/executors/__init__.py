@@ -15,10 +15,27 @@ from typing import Dict, Any, Union, TypeVar, Type, TextIO, List
 import ruamel.yaml.constructor
 from ruamel.yaml import StringIO
 
-from .decorators import as_train_method, as_update_method, store_init_kwargs, as_aggregate_method
+from .decorators import (
+    as_train_method,
+    as_update_method,
+    store_init_kwargs,
+    as_aggregate_method,
+)
 from .metas import get_default_metas, fill_metas_with_defaults
-from ..excepts import EmptyExecutorYAML, BadWorkspace, BadPersistantFile, NoDriverForRequest, UnattachedDriver
-from ..helper import yaml, PathImporter, expand_dict, expand_env_var, get_local_config_source
+from ..excepts import (
+    EmptyExecutorYAML,
+    BadWorkspace,
+    BadPersistantFile,
+    NoDriverForRequest,
+    UnattachedDriver,
+)
+from ..helper import (
+    yaml,
+    PathImporter,
+    expand_dict,
+    expand_env_var,
+    get_local_config_source,
+)
 from ..logging import JinaLogger
 from ..logging.profile import TimeContext
 
@@ -38,7 +55,6 @@ _ref_desolve_map.__dict__['metas'].__dict__['separated_workspace'] = False
 
 
 class ExecutorType(type):
-
     def __new__(cls, *args, **kwargs):
         _cls = super().__new__(cls, *args, **kwargs)
         return cls.register_class(_cls)
@@ -125,6 +141,7 @@ class BaseExecutor(metaclass=ExecutorType):
         Meta fields :mod:`jina.executors.metas.defaults`.
 
     """
+
     store_args_kwargs = False  #: set this to ``True`` to save ``args`` (in a list) and ``kwargs`` (in a map) in YAML config
 
     def __init__(self, *args, **kwargs):
@@ -146,10 +163,13 @@ class BaseExecutor(metaclass=ExecutorType):
                 self.logger.success(f'CUDA compiler version: {cuda_version}')
             except OSError:
                 self.logger.warning(
-                    'on_gpu=True, but you dont have CUDA compatible GPU, i will reset on_gpu=False ')
+                    'on_gpu=True, but you dont have CUDA compatible GPU, i will reset on_gpu=False '
+                )
                 self.on_gpu = False
 
-    def _post_init_wrapper(self, _metas: Dict = None, _requests: Dict = None, fill_in_metas: bool = True) -> None:
+    def _post_init_wrapper(
+        self, _metas: Dict = None, _requests: Dict = None, fill_in_metas: bool = True
+    ) -> None:
         with TimeContext('post initiating, this may take some time', self.logger):
             if fill_in_metas:
                 if not _metas:
@@ -157,6 +177,7 @@ class BaseExecutor(metaclass=ExecutorType):
 
                 if not _requests:
                     from ..executors.requests import get_default_reqs
+
                     _requests = get_default_reqs(type.mro(self.__class__))
 
                 self._fill_metas(_metas)
@@ -173,6 +194,7 @@ class BaseExecutor(metaclass=ExecutorType):
             # if control request is forget in YAML, then fill it
             if 'ControlRequest' not in _requests['on']:
                 from ..drivers.control import ControlReqDriver
+
                 _requests['on']['ControlRequest'] = [ControlReqDriver()]
 
             for req_type, drivers in _requests['on'].items():
@@ -205,7 +227,8 @@ class BaseExecutor(metaclass=ExecutorType):
                 self.logger.warning(
                     'this executor is not named, i will call it "%s". '
                     'naming is important as it provides an unique identifier when '
-                    'persisting this executor on disk.' % _name)
+                    'persisting this executor on disk.' % _name
+                )
             setattr(self, 'name', _name)
         if unresolved_attr:
             _tmp = vars(self)
@@ -215,13 +238,19 @@ class BaseExecutor(metaclass=ExecutorType):
             # set self values filtered by those non-exist, and non-expandable
             for k, v in new_metas.items():
                 if not hasattr(self, k):
-                    if isinstance(v, str) and (re.match(r'{.*?}', v) or re.match(r'\$.*\b', v)):
-                        v = expand_env_var(v.format(root=_ref_desolve_map, this=_ref_desolve_map))
+                    if isinstance(v, str) and (
+                        re.match(r'{.*?}', v) or re.match(r'\$.*\b', v)
+                    ):
+                        v = expand_env_var(
+                            v.format(root=_ref_desolve_map, this=_ref_desolve_map)
+                        )
                     if isinstance(v, str):
                         if not (re.match(r'{.*?}', v) or re.match(r'\$.*\b', v)):
                             setattr(self, k, v)
                         else:
-                            raise ValueError(f'{k}={v} is not expandable or badly referred')
+                            raise ValueError(
+                                f'{k}={v} is not expandable or badly referred'
+                            )
                     else:
                         setattr(self, k, v)
 
@@ -267,12 +296,14 @@ class BaseExecutor(metaclass=ExecutorType):
 
     @property
     def current_workspace(self) -> str:
-        """ Get the path of the current workspace.
+        """Get the path of the current workspace.
 
         :return: if ``separated_workspace`` is set to ``False`` then ``metas.workspace`` is returned,
                 otherwise the ``metas.replica_workspace`` is returned
         """
-        work_dir = self.replica_workspace if self.separated_workspace else self.workspace  # type: str
+        work_dir = (
+            self.replica_workspace if self.separated_workspace else self.workspace
+        )  # type: str
         return work_dir
 
     def get_file_from_workspace(self, name: str) -> str:
@@ -307,8 +338,11 @@ class BaseExecutor(metaclass=ExecutorType):
         try:
             self._post_init_wrapper(fill_in_metas=False)
         except ImportError as ex:
-            self.logger.warning('ImportError is often caused by a missing component, '
-                                'which often can be solved by "pip install" relevant package. %s' % ex, exc_info=True)
+            self.logger.warning(
+                'ImportError is often caused by a missing component, '
+                'which often can be solved by "pip install" relevant package. %s' % ex,
+                exc_info=True,
+            )
 
     def train(self, *args, **kwargs) -> None:
         """
@@ -342,17 +376,23 @@ class BaseExecutor(metaclass=ExecutorType):
         :return: successfully persisted or not
         """
         if not self.is_updated:
-            self.logger.info(f'no update since {self._last_snapshot_ts:%Y-%m-%d %H:%M:%S%z}, will not save. '
-                             'If you really want to save it, call "touch()" before "save()" to force saving')
+            self.logger.info(
+                f'no update since {self._last_snapshot_ts:%Y-%m-%d %H:%M:%S%z}, will not save. '
+                'If you really want to save it, call "touch()" before "save()" to force saving'
+            )
             return False
 
         self.is_updated = False
         f = filename or self.save_abspath
         if not f:
-            f = tempfile.NamedTemporaryFile('w', delete=False, dir=os.environ.get('JINA_EXECUTOR_WORKDIR', None)).name
+            f = tempfile.NamedTemporaryFile(
+                'w', delete=False, dir=os.environ.get('JINA_EXECUTOR_WORKDIR', None)
+            ).name
 
         if self.max_snapshot > 0 and os.path.exists(f):
-            bak_f = f + '.snapshot-%s' % (self._last_snapshot_ts.strftime('%Y%m%d%H%M%S') or 'NA')
+            bak_f = f + '.snapshot-%s' % (
+                self._last_snapshot_ts.strftime('%Y%m%d%H%M%S') or 'NA'
+            )
             os.rename(f, bak_f)
             self._snapshot_files.append(bak_f)
             if len(self._snapshot_files) > self.max_snapshot:
@@ -364,7 +404,9 @@ class BaseExecutor(metaclass=ExecutorType):
             pickle.dump(self, fp)
             self._last_snapshot_ts = datetime.now()
 
-        self.logger.success(f'artifacts of this executor ({self.name}) is persisted to {f}')
+        self.logger.success(
+            f'artifacts of this executor ({self.name}) is persisted to {f}'
+        )
         return True
 
     def save_config(self, filename: str = None) -> bool:
@@ -377,7 +419,9 @@ class BaseExecutor(metaclass=ExecutorType):
         _updated, self.is_updated = self.is_updated, False
         f = filename or self.config_abspath
         if not f:
-            f = tempfile.NamedTemporaryFile('w', delete=False, dir=os.environ.get('JINA_EXECUTOR_WORKDIR', None)).name
+            f = tempfile.NamedTemporaryFile(
+                'w', delete=False, dir=os.environ.get('JINA_EXECUTOR_WORKDIR', None)
+            ).name
         with open(f, 'w', encoding='utf8') as fp:
             yaml.dump(self, fp)
         self.logger.info('executor\'s yaml config is save to %s' % f)
@@ -386,8 +430,12 @@ class BaseExecutor(metaclass=ExecutorType):
         return True
 
     @classmethod
-    def load_config(cls: Type[AnyExecutor], source: Union[str, TextIO], separated_workspace: bool = False,
-                    replica_id: int = 0) -> AnyExecutor:
+    def load_config(
+        cls: Type[AnyExecutor],
+        source: Union[str, TextIO],
+        separated_workspace: bool = False,
+        replica_id: int = 0,
+    ) -> AnyExecutor:
         """Build an executor from a YAML file.
 
         :param filename: the file path of the YAML file or a ``TextIO`` stream to be loaded from
@@ -396,12 +444,18 @@ class BaseExecutor(metaclass=ExecutorType):
         :param replica_id: the id of the storage of this replica, only effective when ``separated_workspace=True``
         :return: an executor object
         """
-        if not source: raise FileNotFoundError
+        if not source:
+            raise FileNotFoundError
         source = get_local_config_source(source)
         # first scan, find if external modules are specified
-        with (open(source, encoding='utf8') if isinstance(source, str) else source) as fp:
+        with (
+            open(source, encoding='utf8') if isinstance(source, str) else source
+        ) as fp:
             # ignore all lines start with ! because they could trigger the deserialization of that class
-            safe_yml = '\n'.join(v if not re.match(r'^[\s-]*?!\b', v) else v.replace('!', '__tag: ') for v in fp)
+            safe_yml = '\n'.join(
+                v if not re.match(r'^[\s-]*?!\b', v) else v.replace('!', '__tag: ')
+                for v in fp
+            )
             tmp = yaml.load(safe_yml)
             if tmp:
                 if 'metas' not in tmp:
@@ -415,16 +469,25 @@ class BaseExecutor(metaclass=ExecutorType):
                         mod = [mod]
 
                     if isinstance(mod, list):
-                        mod = [m if os.path.isabs(m) else os.path.join(os.path.dirname(source), m) for m in mod]
+                        mod = [
+                            m
+                            if os.path.isabs(m)
+                            else os.path.join(os.path.dirname(source), m)
+                            for m in mod
+                        ]
                         PathImporter.add_modules(*mod)
                     else:
-                        raise TypeError(f'{type(mod)!r} is not acceptable, only str or list are acceptable')
+                        raise TypeError(
+                            f'{type(mod)!r} is not acceptable, only str or list are acceptable'
+                        )
 
                 tmp['metas']['separated_workspace'] = separated_workspace
                 tmp['metas']['replica_id'] = replica_id
 
             else:
-                raise EmptyExecutorYAML(f'{source} is empty? nothing to read from there')
+                raise EmptyExecutorYAML(
+                    f'{source} is empty? nothing to read from there'
+                )
 
             tmp = expand_dict(tmp)
             stream = StringIO()
@@ -441,7 +504,8 @@ class BaseExecutor(metaclass=ExecutorType):
 
         It uses ``pickle`` for loading.
         """
-        if not filename: raise FileNotFoundError
+        if not filename:
+            raise FileNotFoundError
         try:
             with open(filename, 'rb') as fp:
                 return pickle.load(fp)
@@ -476,7 +540,8 @@ class BaseExecutor(metaclass=ExecutorType):
     @classmethod
     def _get_instance_from_yaml(cls, constructor, node):
         data = ruamel.yaml.constructor.SafeConstructor.construct_mapping(
-            constructor, node, deep=True)
+            constructor, node, deep=True
+        )
 
         _meta_config = get_default_metas()
         _meta_config.update(data.get('metas', {}))
@@ -501,10 +566,19 @@ class BaseExecutor(metaclass=ExecutorType):
                 # tmp_p = {kk: expand_env_var(vv) for kk, vv in {**k, **p}.items()}
                 tmp_a = a
                 tmp_p = {kk: vv for kk, vv in {**k, **p}.items()}
-                obj = cls(*tmp_a, **tmp_p, metas=data.get('metas', {}), requests=data.get('requests', {}))
+                obj = cls(
+                    *tmp_a,
+                    **tmp_p,
+                    metas=data.get('metas', {}),
+                    requests=data.get('requests', {}),
+                )
             else:
                 # tmp_p = {kk: expand_env_var(vv) for kk, vv in data.get('with', {}).items()}
-                obj = cls(**data.get('with', {}), metas=data.get('metas', {}), requests=data.get('requests', {}))
+                obj = cls(
+                    **data.get('with', {}),
+                    metas=data.get('metas', {}),
+                    requests=data.get('requests', {}),
+                )
 
             obj.logger.success(f'successfully built {cls.__name__} from a yaml config')
             cls.init_from_yaml = False
@@ -516,7 +590,8 @@ class BaseExecutor(metaclass=ExecutorType):
             obj.logger.warning(
                 '"metas" config is not found in this yaml file, '
                 'this map is important as it provides an unique identifier when '
-                'persisting the executor on disk.')
+                'persisting the executor on disk.'
+            )
 
         return obj, data, load_from_dump
 
@@ -524,16 +599,22 @@ class BaseExecutor(metaclass=ExecutorType):
     def _get_dump_path_from_config(meta_config: Dict):
         if 'name' in meta_config:
             if meta_config.get('separated_workspace', False) is True:
-                if 'replica_id' in meta_config and isinstance(meta_config['replica_id'], int):
+                if 'replica_id' in meta_config and isinstance(
+                    meta_config['replica_id'], int
+                ):
                     work_dir = meta_config['replica_workspace']
                     dump_path = os.path.join(work_dir, f'{meta_config["name"]}.{"bin"}')
                     if os.path.exists(dump_path):
                         return dump_path
                 else:
-                    raise BadWorkspace('separated_workspace=True but replica_id is unset or set to a bad value')
+                    raise BadWorkspace(
+                        'separated_workspace=True but replica_id is unset or set to a bad value'
+                    )
             else:
-                dump_path = os.path.join(meta_config.get('workspace', os.getcwd()),
-                                         f'{meta_config["name"]}.{"bin"}')
+                dump_path = os.path.join(
+                    meta_config.get('workspace', os.getcwd()),
+                    f'{meta_config["name"]}.{"bin"}',
+                )
                 if os.path.exists(dump_path):
                     return dump_path
 

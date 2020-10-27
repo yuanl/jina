@@ -22,7 +22,9 @@ class MockIndexer(BaseVectorIndexer):
     def get_create_handler(self):
         pass
 
-    def query(self, vectors: 'np.ndarray', top_k: int, *args, **kwargs) -> Tuple['np.ndarray', 'np.ndarray']:
+    def query(
+        self, vectors: 'np.ndarray', top_k: int, *args, **kwargs
+    ) -> Tuple['np.ndarray', 'np.ndarray']:
         # vectors that will come are 1-D arrays with chunk ID value,
         # mock the indexer so that every chunk matches a chunk
         # with an id that is 100 * chunk.id, and an embedding of [chunk.id * 0.01]
@@ -40,7 +42,6 @@ class MockIndexer(BaseVectorIndexer):
 
 
 class SimpleVectorSearchDriver(VectorSearchDriver):
-
     @property
     def queryset(self):
         q = jina_pb2.QueryLang()
@@ -93,8 +94,12 @@ def test_vectorsearch_driver_mock_indexer():
         assert chunk.matches[1].granularity == chunk.granularity
         assert chunk.matches[0].score.ref_id == str(chunk.id)
         assert chunk.matches[1].score.ref_id == str(chunk.id)
-        assert chunk.matches[0].score.value == pytest.approx(int(chunk.id) * 0.01, 0.0001)
-        assert chunk.matches[1].score.value == pytest.approx(int(chunk.id) * 0.1, 0.0001)
+        assert chunk.matches[0].score.value == pytest.approx(
+            int(chunk.id) * 0.01, 0.0001
+        )
+        assert chunk.matches[1].score.value == pytest.approx(
+            int(chunk.id) * 0.1, 0.0001
+        )
         assert chunk.matches[-1].embedding.buffer == b''
 
 

@@ -9,7 +9,6 @@ cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class MyTestCase(JinaTestCase):
-
     def test_share_workspace(self):
         for j in range(3):
             a = BaseExecutor.load_config('yaml/test-workspace.yml', True, j)
@@ -77,8 +76,13 @@ class MyTestCase(JinaTestCase):
             self.assertTrue(os.path.exists(a[0].index_abspath))
             self.assertTrue(os.path.exists(a[1].save_abspath))
             self.assertTrue(os.path.exists(a[1].index_abspath))
-            self.add_tmpfile(a[0].save_abspath, a[1].save_abspath, a[0].index_abspath, a[1].index_abspath,
-                             a.current_workspace)
+            self.add_tmpfile(
+                a[0].save_abspath,
+                a[1].save_abspath,
+                a[0].index_abspath,
+                a[1].index_abspath,
+                a.current_workspace,
+            )
 
         recovered_vecs = []
         for j in range(3):

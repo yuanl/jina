@@ -46,6 +46,3 @@ def test_flow_before_after():
         assert f.num_pods == 2
         assert f._pod_nodes['p1'].num_peas == 3
         assert f.num_peas == 4
-
-
-

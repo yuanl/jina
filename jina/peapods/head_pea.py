@@ -9,7 +9,6 @@ from ..logging import JinaLogger
 
 
 class HeadPea(BasePea):
-
     def __init__(self, args: Union['argparse.Namespace', Dict]):
         super().__init__(args)
         self.name = self.__class__.__name__

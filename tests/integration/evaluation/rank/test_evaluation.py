@@ -12,15 +12,15 @@ def test_evaluation(tmpdir):
 
     def index_documents():
         """Index Documents:
-            doc: tag__id = 0
-                 tag__dummy_score = 0
-                 embedding = 0
-            doc: tag__id = 1
-                 tag__dummy_score = -1
-                 embedding = 1
-            doc: tag__id = 2
-                 tag__dummy_score = -2
-                 embedding = 2
+        doc: tag__id = 0
+             tag__dummy_score = 0
+             embedding = 0
+        doc: tag__id = 1
+             tag__dummy_score = -1
+             embedding = 1
+        doc: tag__id = 2
+             tag__dummy_score = -2
+             embedding = 2
         """
         doc0 = jina_pb2.Document()
         doc0.tags['id'] = '0'
@@ -42,7 +42,9 @@ def test_evaluation(tmpdir):
     def validate_evaluation_response(resp):
         assert len(resp.docs) == 2
         for doc in resp.docs:
-            assert len(doc.evaluations) == 8  # 2 evaluation Pods with 4 evaluations each
+            assert (
+                len(doc.evaluations) == 8
+            )  # 2 evaluation Pods with 4 evaluations each
 
         doc = resp.docs[0]
         assert len(doc.matches) == 2
@@ -130,7 +132,7 @@ def test_evaluation(tmpdir):
             input_fn=doc_groundtruth_evaluation_pairs(),
             output_fn=validate_evaluation_response,
             callback_on_body=True,
-            top_k=2
+            top_k=2,
         )
 
     del os.environ['JINA_TEST_RANKING_EVALUATION']

@@ -51,10 +51,17 @@ def test_flow_pod(runtime):
 
 @pytest.mark.parametrize('runtime', ['process', 'thread'])
 def test_pod_context(runtime):
-    args = set_pod_parser().parse_args(['--runtime', runtime,
-                                        '--parallel', '2',
-                                        '--max-idle-time', '5',
-                                        '--shutdown-idle'])
+    args = set_pod_parser().parse_args(
+        [
+            '--runtime',
+            runtime,
+            '--parallel',
+            '2',
+            '--max-idle-time',
+            '5',
+            '--shutdown-idle',
+        ]
+    )
     with BasePod(args) as bp:
         bp.join()
 
@@ -63,10 +70,10 @@ def test_pod_context(runtime):
 
 def test_pod_gracefully_close_idle():
     import time
-    args = set_pod_parser().parse_args(['--name', 'pod',
-                                        '--parallel', '2',
-                                        '--max-idle-time', '4',
-                                        '--shutdown-idle'])
+
+    args = set_pod_parser().parse_args(
+        ['--name', 'pod', '--parallel', '2', '--max-idle-time', '4', '--shutdown-idle']
+    )
 
     start_time = time.time()
     with BasePod(args) as bp:

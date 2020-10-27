@@ -3,6 +3,7 @@ import pytest
 from jina.proto.jina_pb2 import Document
 from google.protobuf.json_format import MessageToJson, Parse
 
+
 @pytest.fixture(scope='function')
 def document():
     d = Document()
@@ -12,6 +13,7 @@ def document():
     d.tags['bool'] = True
     d.tags['nested'] = {'bool': True}
     return d
+
 
 def test_tags(document):
     jd = MessageToJson(document)
@@ -24,6 +26,3 @@ def test_tags(document):
     # can be used as a dict
     for _, _ in d2.tags['nested'].items():
         continue
-
-
-

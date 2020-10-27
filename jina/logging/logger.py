@@ -61,20 +61,21 @@ class NTLogger:
 
 
 class SysLogHandlerWrapper(SysLogHandler):
-    """ Override the priority_map :class:`SysLogHandler`
+    """Override the priority_map :class:`SysLogHandler`
 
     .. warning::
         This messages at DEBUG and INFO are therefore not stored by ASL, (ASL = Apple System Log)
         which in turn means they can't be printed by syslog after the fact. You can confirm it via :command:`syslog` or
         :command:`tail -f /var/log/system.log`
     """
+
     priority_map = {
         'DEBUG': 'debug',
         'INFO': 'info',
         'WARNING': 'warning',
         'ERROR': 'error',
         'CRITICAL': 'critical',
-        'SUCCESS': 'notice'
+        'SUCCESS': 'notice',
     }
 
 
@@ -86,8 +87,12 @@ class JinaLogger:
 
         if not log_config:
             # when not exist check if there is some os environ
-            log_config = os.getenv('JINA_LOG_CONFIG',
-                                   resource_filename('jina', '/'.join(('resources', 'logging.default.yml'))))
+            log_config = os.getenv(
+                'JINA_LOG_CONFIG',
+                resource_filename(
+                    'jina', '/'.join(('resources', 'logging.default.yml'))
+                ),
+            )
 
         log_config = complete_path(log_config)
 
@@ -98,15 +103,21 @@ class JinaLogger:
         self.logger = logging.getLogger(context)
         self.logger.propagate = False
 
-        context_vars = {'name': os.environ.get('JINA_POD_NAME', context),
-                        'uptime': __uptime__,
-                        'context': context}
+        context_vars = {
+            'name': os.environ.get('JINA_POD_NAME', context),
+            'uptime': __uptime__,
+            'context': context,
+        }
         self.add_handlers(log_config, **context_vars)
 
         # note logger.success isn't default there
         success_level = LogVerbosity.SUCCESS.value  # between WARNING and INFO
         logging.addLevelName(success_level, 'SUCCESS')
-        setattr(self.logger, 'success', lambda message: self.logger.log(success_level, message))
+        setattr(
+            self.logger,
+            'success',
+            lambda message: self.logger.log(success_level, message),
+        )
 
         self.info = self.logger.info
         self.critical = self.logger.critical
@@ -140,7 +151,9 @@ class JinaLogger:
             fmt = getattr(formatter, cfg.get('formatter', 'PlainFormatter'))
 
             if h not in self.supported or not cfg:
-                raise ValueError(f'can not find configs for {h}, maybe it is not supported')
+                raise ValueError(
+                    f'can not find configs for {h}, maybe it is not supported'
+                )
 
             handler = None
             if h == 'StreamHandler':
@@ -158,23 +171,28 @@ class JinaLogger:
                 if handler:
                     handler.ident = cfg.get('ident', '')
                     handler.setFormatter(fmt(cfg['format'].format_map(kwargs)))
-                    
+
                 try:
                     handler._connect_unixsocket(handler.address)
                 except OSError:
                     handler = None
                     pass
             elif h == 'FileHandler':
-                handler = logging.FileHandler(cfg['output'].format_map(kwargs), delay=True)
+                handler = logging.FileHandler(
+                    cfg['output'].format_map(kwargs), delay=True
+                )
                 handler.setFormatter(fmt(cfg['format'].format_map(kwargs)))
             elif h == 'FluentHandler':
                 try:
                     from fluent import asynchandler as fluentasynchandler
                     from fluent.handler import FluentRecordFormatter
 
-                    handler = fluentasynchandler.FluentHandler(cfg['tag'],
-                                                               host=cfg['host'],
-                                                               port=cfg['port'], queue_circular=True)
+                    handler = fluentasynchandler.FluentHandler(
+                        cfg['tag'],
+                        host=cfg['host'],
+                        port=cfg['port'],
+                        queue_circular=True,
+                    )
 
                     cfg['format'].update(kwargs)
                     fmt = FluentRecordFormatter(cfg['format'])

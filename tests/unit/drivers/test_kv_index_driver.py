@@ -7,7 +7,6 @@ from jina.proto import jina_pb2, uid
 
 
 class MockGroundTruthIndexer(BaseKVIndexer):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.docs = {}
@@ -71,4 +70,7 @@ def test_kv_index_driver(mock_groundtruth_indexer, simple_kv_indexer_driver, doc
 
     assert len(mock_groundtruth_indexer.docs) == 5
     for idx, doc in enumerate(documents):
-        assert mock_groundtruth_indexer.docs[uid.id2hash(doc.id)] == doc.SerializeToString()
+        assert (
+            mock_groundtruth_indexer.docs[uid.id2hash(doc.id)]
+            == doc.SerializeToString()
+        )

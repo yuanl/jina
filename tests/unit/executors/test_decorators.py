@@ -3,8 +3,14 @@ import os
 import numpy as np
 import pytest
 
-from jina.executors.decorators import as_update_method, as_train_method, as_ndarray, batching, \
-    require_train, store_init_kwargs
+from jina.executors.decorators import (
+    as_update_method,
+    as_train_method,
+    as_ndarray,
+    batching,
+    require_train,
+    store_init_kwargs,
+)
 
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -172,7 +178,9 @@ def test_batching_ordinal_idx_arg(tmpdir):
             return list(range(ord_idx.start, ord_idx.stop))
 
     instance = A(2)
-    result = instance.f(np.memmap(path, dtype=vec.dtype.name, mode='r', shape=vec.shape), vec.shape[0])
+    result = instance.f(
+        np.memmap(path, dtype=vec.dtype.name, mode='r', shape=vec.shape), vec.shape[0]
+    )
     assert len(instance.ord_idx) == 5
     assert instance.ord_idx[0].start == 0
     assert instance.ord_idx[0].stop == 2
@@ -188,7 +196,9 @@ def test_batching_ordinal_idx_arg(tmpdir):
     assert result == [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]]
 
 
-@pytest.mark.skip(reason='Currently wrong implementation of batching with labels, not well considered in batching helper')
+@pytest.mark.skip(
+    reason='Currently wrong implementation of batching with labels, not well considered in batching helper'
+)
 def test_batching_with_label():
     class A:
         def __init__(self, batch_size):

@@ -18,7 +18,9 @@ try:
         pkg_name = 'jina'
         libinfo_py = path.join('..', pkg_name, '__init__.py')
         libinfo_content = open(libinfo_py, 'r').readlines()
-        version_line = [l.strip() for l in libinfo_content if l.startswith('__version__')][0]
+        version_line = [
+            l.strip() for l in libinfo_content if l.startswith('__version__')
+        ][0]
         exec(version_line)
     else:
         __version__ = os.environ['JINA_VERSION']
@@ -47,7 +49,7 @@ html_theme_options = {
     # 'navigation_depth': 4,
     'includehidden': True,
     'titles_only': True,
-    'show_sphinx': False
+    'show_sphinx': False,
 }
 
 html_static_path = ['_static']
@@ -58,7 +60,9 @@ html_show_sourcelink = False
 
 latex_documents = [(master_doc, f'{slug}.tex', project, author, 'manual')]
 man_pages = [(master_doc, slug, project, [author], 1)]
-texinfo_documents = [(master_doc, slug, project, author, slug, project, 'Miscellaneous')]
+texinfo_documents = [
+    (master_doc, slug, project, author, slug, project, 'Miscellaneous')
+]
 epub_title = project
 epub_exclude_files = ['search.html']
 
@@ -118,7 +122,7 @@ def setup(app):
                 label=_('Type'),
                 has_arg=False,
                 names=('type',),
-                bodyrolename='class'
+                bodyrolename='class',
             ),
             Field(
                 'default',
@@ -126,5 +130,5 @@ def setup(app):
                 has_arg=False,
                 names=('default',),
             ),
-        ]
+        ],
     )

@@ -6,7 +6,6 @@ from jina.proto import jina_pb2
 
 
 class MockMatches2DocRankDriver(Matches2DocRankDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.hash2id = lambda x: str(int(x))
@@ -24,7 +23,7 @@ class MockAbsoluteLengthRanker(Match2DocRanker):
 
     def score(self, query_meta, old_match_scores, match_meta):
         new_scores = [
-            (match_id, - abs(match_meta[match_id]['length'] - query_meta['length']))
+            (match_id, -abs(match_meta[match_id]['length'] - query_meta['length']))
             for match_id, old_score in old_match_scores.items()
         ]
 
@@ -59,7 +58,11 @@ def test_chunk2doc_ranker_driver_mock_exec():
     driver = MockMatches2DocRankDriver()
     executor = MockAbsoluteLengthRanker()
     driver.attach(executor=executor, pea=None)
-    driver._traverse_apply([doc, ])
+    driver._traverse_apply(
+        [
+            doc,
+        ]
+    )
     assert len(doc.matches) == 4
     assert doc.matches[0].id == '3'
     assert doc.matches[0].score.value == -1

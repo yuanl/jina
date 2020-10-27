@@ -55,13 +55,14 @@ class BinaryPbIndexer(BaseKVIndexer):
     def add(self, keys: Iterator[int], values: Iterator[bytes], *args, **kwargs):
         for key, value in zip(keys, values):
             l = len(value)  #: the length
-            p = int(self._start / self._page_size) * self._page_size  #: offset of the page
-            r = self._start % self._page_size  #: the remainder, i.e. the start position given the offset
+            p = (
+                int(self._start / self._page_size) * self._page_size
+            )  #: offset of the page
+            r = (
+                self._start % self._page_size
+            )  #: the remainder, i.e. the start position given the offset
             self.write_handler.header.write(
-                np.array(
-                    (key, p, r, r + l),
-                    dtype=np.int64
-                ).tobytes()
+                np.array((key, p, r, r + l), dtype=np.int64).tobytes()
             )
             self._start += l
             self.write_handler.body.write(value)
@@ -78,7 +79,7 @@ class BinaryPbIndexer(BaseKVIndexer):
 
 class DataURIPbIndexer(BinaryPbIndexer):
     """Shortcut for :class:`DocPbIndexer` equipped with ``requests.on`` for storing doc-level protobuf and data uri info,
-    differ with :class:`ChunkPbIndexer` only in ``requests.on`` """
+    differ with :class:`ChunkPbIndexer` only in ``requests.on``"""
 
 
 class UniquePbIndexer(CompoundExecutor):

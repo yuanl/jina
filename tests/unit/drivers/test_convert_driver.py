@@ -13,7 +13,11 @@ def create_document(arr_size):
     return doc
 
 
-docs = [create_document([32*28]), create_document([32, 28]), create_document([32, 28, 3])]
+docs = [
+    create_document([32 * 28]),
+    create_document([32, 28]),
+    create_document([32, 28, 3]),
+]
 modes = ['L', 'L', 'RGB']
 test_data = zip(docs, modes)
 
@@ -25,4 +29,6 @@ def test_blob2pnguri_driver(data):
 
     driver = Blob2PngURI(target='uri', width=width, height=height)
     driver._apply_all([doc])
-    Image.frombytes(mode, (width, height), doc.uri.encode()) # just to check if the data is enough for the image recreation
+    Image.frombytes(
+        mode, (width, height), doc.uri.encode()
+    )  # just to check if the data is enough for the image recreation

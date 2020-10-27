@@ -10,7 +10,6 @@ DOCUMENTS_PER_LEVEL = 1
 
 
 class AppendOneChunkTwoMatchesCrafter(BaseRecursiveDriver):
-
     def _apply_all(self, docs, *args, **kwargs) -> None:
         for doc in docs:
             add_chunk(doc)
@@ -228,7 +227,9 @@ def test_traverse_apply():
     docs = build_docs()
     doc = docs[0]
     doc.ClearField('chunks')
-    docs = [doc, ]
+    docs = [
+        doc,
+    ]
     driver = AppendOneChunkTwoMatchesCrafter(traversal_paths=('mcm',))
     assert docs[0].matches[0].chunks[0].matches[0].granularity == 1
     assert docs[0].matches[0].chunks[0].matches[0].adjacency == 2

@@ -9,8 +9,7 @@ from ..compound import CompoundExecutor
 
 
 class BaseEvaluator(BaseExecutor):
-    """A :class:`BaseEvaluator` is used to evaluate different messages coming from any kind of executor
-    """
+    """A :class:`BaseEvaluator` is used to evaluate different messages coming from any kind of executor"""
 
     def post_init(self):
         super().post_init()
@@ -80,4 +79,4 @@ class FileBasedEvaluator(CompoundExecutor):
                  executor: BaseEvaluator
            ControlRequest:
              - !ControlReqDriver {}
-     """
+    """

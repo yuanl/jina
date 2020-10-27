@@ -18,7 +18,6 @@ class MockEncoder(BaseEncoder):
 
 
 class SimpleEncoderDriver(EncodeDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

@@ -42,10 +42,15 @@ def test_standard_query():
             print(used_memory_readable())
             print(result[0].shape)
         with open(summary_file, 'a') as fp:
-            json.dump({'name': 'naive',
-                       'memory': mem2 - mem1,
-                       'readable': get_readable_size(mem2 - mem1),
-                       'time': ti.duration}, fp)
+            json.dump(
+                {
+                    'name': 'naive',
+                    'memory': mem2 - mem1,
+                    'readable': get_readable_size(mem2 - mem1),
+                    'time': ti.duration,
+                },
+                fp,
+            )
             fp.write('\n')
 
     rm_files([ni.index_abspath, ni.save_abspath, 'a.bin', 'a.gz'])

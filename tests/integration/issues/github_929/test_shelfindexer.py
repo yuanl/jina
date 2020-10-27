@@ -28,7 +28,9 @@ def test_shelf_in_flow(uses):
 
     def validate(req):
         m4 = used_memory()
-        print(f'before: {m1}, after index: {m2}, after loading: {m3} after searching {m4}')
+        print(
+            f'before: {m1}, after index: {m2}, after loading: {m3} after searching {m4}'
+        )
 
     with f:
         m3 = used_memory()

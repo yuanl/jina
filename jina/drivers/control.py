@@ -76,10 +76,12 @@ class RouteDriver(ControlReqDriver):
                     self.pea.zmqlet.pause_pollin()
                     self.is_pollin_paused = True
             elif self.raise_no_dealer:
-                raise RuntimeError('if this router connects more than one dealer, '
-                                   'then this error should never be raised. often when it '
-                                   'is raised, some Pods must fail to start, so please go '
-                                   'up and check the first error message in the log')
+                raise RuntimeError(
+                    'if this router connects more than one dealer, '
+                    'then this error should never be raised. often when it '
+                    'is raised, some Pods must fail to start, so please go '
+                    'up and check the first error message in the log'
+                )
             # else:
             #    this FALLBACK to trivial message pass
             #

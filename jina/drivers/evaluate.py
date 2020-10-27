@@ -11,16 +11,15 @@ from ..proto import jina_pb2
 
 
 class BaseEvaluateDriver(BaseExecutableDriver):
-    def __init__(self, executor: str = None,
-                 method: str = 'evaluate',
-                 *args,
-                 **kwargs):
+    def __init__(self, executor: str = None, method: str = 'evaluate', *args, **kwargs):
         super().__init__(executor, method, *args, **kwargs)
 
     def __call__(self, *args, **kwargs):
         assert len(self.req.docs) == len(self.req.groundtruths)
-        docs_groundtruths = [DocGroundtruthPair(doc, groundtruth) for doc, groundtruth in
-                             zip(self.req.docs, self.req.groundtruths)]
+        docs_groundtruths = [
+            DocGroundtruthPair(doc, groundtruth)
+            for doc, groundtruth in zip(self.req.docs, self.req.groundtruths)
+        ]
         self._traverse_apply(docs_groundtruths, *args, **kwargs)
 
     @property
@@ -31,18 +30,20 @@ class BaseEvaluateDriver(BaseExecutableDriver):
             return self.__class__.__name__
 
     def _apply_all(
-            self,
-            docs: Iterable['jina_pb2.Document'],
-            context_doc: 'jina_pb2.Document' = None,
-            field: str = None,
-            *args,
-            **kwargs
+        self,
+        docs: Iterable['jina_pb2.Document'],
+        context_doc: 'jina_pb2.Document' = None,
+        field: str = None,
+        *args,
+        **kwargs,
     ) -> None:
         for doc_groundtruth in docs:
             doc = doc_groundtruth.doc
             groundtruth = doc_groundtruth.groundtruth
             evaluation = doc.evaluations.add()
-            evaluation.value = self.exec_fn(self.extract(doc), self.extract(groundtruth))
+            evaluation.value = self.exec_fn(
+                self.extract(doc), self.extract(groundtruth)
+            )
             evaluation.op_name = f'{self.metric}-{self.exec.metric}'
             evaluation.ref_id = groundtruth.id
 
@@ -61,9 +62,7 @@ class FieldEvaluateDriver(BaseEvaluateDriver):
     Evaluate on the values from certain field, the extraction is implemented with :meth:`dunder_get`
     """
 
-    def __init__(self, field: str,
-                 *args,
-                 **kwargs):
+    def __init__(self, field: str, *args, **kwargs):
         """
 
         :param field: the field name to be extracted from the Protobuf
@@ -81,13 +80,9 @@ class FieldEvaluateDriver(BaseEvaluateDriver):
 
 
 class RankEvaluateDriver(BaseEvaluateDriver):
-    """Drivers used to pass `matches` from documents and groundtruths to an executor and add the evaluation value
-    """
+    """Drivers used to pass `matches` from documents and groundtruths to an executor and add the evaluation value"""
 
-    def __init__(self,
-                 id_tag: str = 'id',
-                 *args,
-                 **kwargs):
+    def __init__(self, id_tag: str = 'id', *args, **kwargs):
         """
 
         :param id_tag: the name of the tag to be extracted, when not given then ``document.id`` is used.
@@ -146,7 +141,9 @@ class LoadGroundTruthDriver(KVSearchDriver):
 
     def __call__(self, *args, **kwargs):
         assert len(self.req.groundtruths) == 0
-        miss_idx = []  #: missed hit results, some documents may not have groundtruth and thus will be removed
+        miss_idx = (
+            []
+        )  #: missed hit results, some documents may not have groundtruth and thus will be removed
         for idx, doc in enumerate(self.req.docs):
             serialized_groundtruth = self.exec_fn(self.id2hash(doc.id))
             if serialized_groundtruth:

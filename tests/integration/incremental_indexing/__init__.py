@@ -23,5 +23,3 @@ def get_duplicate_docs(num_docs=10):
         result.append(doc)
         unique_set.add(content)
     return result, len(unique_set)
-
-

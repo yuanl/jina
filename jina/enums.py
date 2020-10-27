@@ -39,7 +39,6 @@ from enum import IntEnum, EnumMeta
 
 
 class EnumType(EnumMeta):
-
     def __new__(cls, *args, **kwargs):
         _cls = super().__new__(cls, *args, **kwargs)
         return cls.register_class(_cls)
@@ -51,6 +50,7 @@ class EnumType(EnumMeta):
             reg_cls_set.add(cls.__name__)
             setattr(cls, '_registered_class', reg_cls_set)
         from .helper import yaml
+
         yaml.register_class(cls)
         return cls
 
@@ -84,9 +84,8 @@ class SchedulerType(BetterEnum):
 
 
 class PollingType(BetterEnum):
-    """The enum for representing the parallel type of peas in a pod
+    """The enum for representing the parallel type of peas in a pod"""
 
-    """
     ANY = 1  #: one of the replica will receive the message
     ALL = 2  #: all replica will receive the message, blocked until all done with the message
     ALL_ASYNC = 3  #: (reserved) all replica will receive the message, but any one of them can return, useful in backup
@@ -110,6 +109,7 @@ class PollingType(BetterEnum):
 
 class FlowOptimizeLevel(BetterEnum):
     """The level of flow optimization """
+
     NONE = 0
     IGNORE_GATEWAY = 1
     FULL = 2
@@ -117,6 +117,7 @@ class FlowOptimizeLevel(BetterEnum):
 
 class LogVerbosity(BetterEnum):
     """Verbosity level of the logger """
+
     DEBUG = 10
     INFO = 20
     SUCCESS = 25
@@ -127,6 +128,7 @@ class LogVerbosity(BetterEnum):
 
 class SocketType(BetterEnum):
     """Enums for representing the socket type in a pod """
+
     PULL_BIND = 0
     PULL_CONNECT = 1
     PUSH_BIND = 2
@@ -180,12 +182,13 @@ class SocketType(BetterEnum):
             SocketType.PUSH_BIND: SocketType.PULL_CONNECT,
             SocketType.PUB_CONNECT: SocketType.SUB_BIND,
             SocketType.PUB_BIND: SocketType.SUB_CONNECT,
-            SocketType.PAIR_CONNECT: SocketType.PAIR_BIND
+            SocketType.PAIR_CONNECT: SocketType.PAIR_BIND,
         }[self]
 
 
 class FlowOutputType(BetterEnum):
     """The enum for representing flow output config """
+
     SHELL_PROC = 0  #: a shell-script, run each microservice as a process
     SHELL_DOCKER = 1  #: a shell-script, run each microservice as a container
     DOCKER_SWARM = 2  #: a docker-swarm YAML config
@@ -197,14 +200,14 @@ class FlowBuildLevel(BetterEnum):
 
     Some :class:`jina.flow.Flow` class functions require certain build level to run.
     """
+
     EMPTY = 0  #: Nothing is built
     GRAPH = 1  #: The underlying graph is built, you may visualize the flow
 
 
 class PeaRoleType(BetterEnum):
-    """ The enum of a Pea role
+    """The enum of a Pea role"""
 
-    """
     SINGLETON = 0
     HEAD = 1
     TAIL = 2
@@ -212,9 +215,8 @@ class PeaRoleType(BetterEnum):
 
 
 class PodRoleType(BetterEnum):
-    """ The enum of a Pod role for visualization
+    """The enum of a Pod role for visualization"""
 
-    """
     POD = 0
     JOIN = 1
     INSPECT = 2
@@ -233,9 +235,8 @@ class PodRoleType(BetterEnum):
 
 
 class ClientMode(BetterEnum):
-    """ The enum of Client mode
+    """The enum of Client mode"""
 
-    """
     INDEX = 0
     SEARCH = 1
     TRAIN = 2
@@ -243,9 +244,7 @@ class ClientMode(BetterEnum):
 
 
 class OnErrorSkip(BetterEnum):
-    """ The level of error handling
-
-    """
+    """The level of error handling"""
 
     NONE = 0
     EXECUTOR = 1
@@ -255,8 +254,7 @@ class OnErrorSkip(BetterEnum):
 
 
 class FlowInspectType(BetterEnum):
-    """ Inspect strategy in the flow
-    """
+    """Inspect strategy in the flow"""
 
     HANG = 0  # keep them hanging there
     REMOVE = 1  # remove them in the build

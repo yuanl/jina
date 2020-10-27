@@ -15,7 +15,9 @@ import sys
 # do some os-wise patches
 
 if sys.version_info < (3, 7, 0):
-    raise OSError('Jina requires Python 3.7 and above, but yours is %s' % sys.version_info)
+    raise OSError(
+        'Jina requires Python 3.7 and above, but yours is %s' % sys.version_info
+    )
 
 if sys.version_info >= (3, 8, 0) and platform.system() == 'Darwin':
     # temporary fix for python 3.8 on macos where the default start is set to "spawn"
@@ -37,37 +39,43 @@ __uptime__ = datetime.now().strftime('%Y%m%d%H%M%S')
 # 1. clean this tuple,
 # 2. grep -ohE "\'JINA_.*?\'" **/*.py | sort -u | sed "s/$/,/g"
 # 3. copy all lines EXCEPT the first (which is the grep command in the last line)
-__jina_env__ = ('JINA_ARRAY_QUANT',
-                'JINA_BINARY_DELIMITER',
-                'JINA_CONTRIB_MODULE',
-                'JINA_CONTRIB_MODULE_IS_LOADING',
-                'JINA_CONTROL_PORT',
-                'JINA_DB_COLLECTION',
-                'JINA_DB_HOSTNAME',
-                'JINA_DB_NAME',
-                'JINA_DB_PASSWORD',
-                'JINA_DB_USERNAME',
-                'JINA_DEFAULT_HOST',
-                'JINA_DISABLE_UVLOOP',
-                'JINA_EXECUTOR_WORKDIR',
-                'JINA_FULL_CLI',
-                'JINA_IPC_SOCK_TMP',
-                'JINA_LOG_CONFIG',
-                'JINA_LOG_NO_COLOR',
-                'JINA_POD_NAME',
-                'JINA_PROFILING',
-                'JINA_RANDOM_PORTS',
-                'JINA_SOCKET_HWM',
-                'JINA_TEST_GPU',
-                'JINA_TEST_PRETRAINED',
-                'JINA_VCS_VERSION',
-                'JINA_WARN_UNNAMED')
+__jina_env__ = (
+    'JINA_ARRAY_QUANT',
+    'JINA_BINARY_DELIMITER',
+    'JINA_CONTRIB_MODULE',
+    'JINA_CONTRIB_MODULE_IS_LOADING',
+    'JINA_CONTROL_PORT',
+    'JINA_DB_COLLECTION',
+    'JINA_DB_HOSTNAME',
+    'JINA_DB_NAME',
+    'JINA_DB_PASSWORD',
+    'JINA_DB_USERNAME',
+    'JINA_DEFAULT_HOST',
+    'JINA_DISABLE_UVLOOP',
+    'JINA_EXECUTOR_WORKDIR',
+    'JINA_FULL_CLI',
+    'JINA_IPC_SOCK_TMP',
+    'JINA_LOG_CONFIG',
+    'JINA_LOG_NO_COLOR',
+    'JINA_POD_NAME',
+    'JINA_PROFILING',
+    'JINA_RANDOM_PORTS',
+    'JINA_SOCKET_HWM',
+    'JINA_TEST_GPU',
+    'JINA_TEST_PRETRAINED',
+    'JINA_VCS_VERSION',
+    'JINA_WARN_UNNAMED',
+)
 
 __default_host__ = os.environ.get('JINA_DEFAULT_HOST', '0.0.0.0')
 __ready_msg__ = 'ready and listening'
 __stop_msg__ = 'terminated'
-__unable_to_load_pretrained_model_msg__ = 'Executor depending on pretrained model file could not find the pretrained model'
-__binary_delimiter__ = os.environ.get('JINA_BINARY_DELIMITER', '460841a0a8a430ae25d9ad7c1f048c57').encode()
+__unable_to_load_pretrained_model_msg__ = (
+    'Executor depending on pretrained model file could not find the pretrained model'
+)
+__binary_delimiter__ = os.environ.get(
+    'JINA_BINARY_DELIMITER', '460841a0a8a430ae25d9ad7c1f048c57'
+).encode()
 
 JINA_GLOBAL = SimpleNamespace()
 JINA_GLOBAL.imported = SimpleNamespace()
@@ -77,8 +85,12 @@ JINA_GLOBAL.imported.hub = False
 JINA_GLOBAL.logserver = SimpleNamespace()
 
 
-def import_classes(namespace: str, targets=None,
-                   show_import_table: bool = False, import_once: bool = False):
+def import_classes(
+    namespace: str,
+    targets=None,
+    show_import_table: bool = False,
+    import_once: bool = False,
+):
     """
     Import all or selected executors into the runtime. This is called when Jina is first imported for registering the YAML
     constructor beforehand. It can be also used to import third-part or external executors.
@@ -115,20 +127,26 @@ def import_classes(namespace: str, targets=None,
         path = os.path.dirname(pkgutil.get_loader(namespace).path)
     except AttributeError:
         if namespace == 'jina.hub':
-            default_logger.debug(f'hub submodule is not initialized. Please try "git submodule update --init"')
+            default_logger.debug(
+                f'hub submodule is not initialized. Please try "git submodule update --init"'
+            )
         return {}
 
     modules = set()
 
     for info in iter_modules([path]):
-        if (namespace != 'jina.hub' and not info.ispkg) or (namespace == 'jina.hub' and info.ispkg):
+        if (namespace != 'jina.hub' and not info.ispkg) or (
+            namespace == 'jina.hub' and info.ispkg
+        ):
             modules.add('.'.join([namespace, info.name]))
 
     for pkg in find_packages(path):
         modules.add('.'.join([namespace, pkg]))
         pkgpath = path + '/' + pkg.replace('.', '/')
         for info in iter_modules([pkgpath]):
-            if (namespace != 'jina.hub' and not info.ispkg) or (namespace == 'jina.hub' and info.ispkg):
+            if (namespace != 'jina.hub' and not info.ispkg) or (
+                namespace == 'jina.hub' and info.ispkg
+            ):
                 modules.add('.'.join([namespace, pkg, info.name]))
 
     # filter
@@ -136,6 +154,7 @@ def import_classes(namespace: str, targets=None,
     modules = {m for m in modules if not re.findall(ignored_module_pattern, m)}
 
     from collections import defaultdict
+
     load_stat = defaultdict(list)
     bad_imports = []
 
@@ -151,16 +170,26 @@ def import_classes(namespace: str, targets=None,
     depend_tree = {}
     import importlib
     from .helper import colored
+
     for m in modules:
         try:
             mod = importlib.import_module(m)
             for k in dir(mod):
                 # import the class
-                if (getattr(mod, k).__class__.__name__ == import_type) and (not targets or k in targets):
+                if (getattr(mod, k).__class__.__name__ == import_type) and (
+                    not targets or k in targets
+                ):
                     try:
                         _c = getattr(mod, k)
                         load_stat[m].append(
-                            (k, True, colored('▸', 'green').join(f'{vvv.__name__}' for vvv in _c.mro()[:-1][::-1])))
+                            (
+                                k,
+                                True,
+                                colored('▸', 'green').join(
+                                    f'{vvv.__name__}' for vvv in _c.mro()[:-1][::-1]
+                                ),
+                            )
+                        )
                         d = depend_tree
                         for vvv in _c.mro()[:-1][::-1]:
                             if vvv.__name__ not in d:
@@ -174,6 +203,7 @@ def import_classes(namespace: str, targets=None,
                         try:
                             # load the default request for this executor if possible
                             from .executors.requests import get_default_reqs
+
                             get_default_reqs(type.mro(getattr(mod, k)))
                         except ValueError:
                             pass
@@ -191,18 +221,21 @@ def import_classes(namespace: str, targets=None,
 
     if show_import_table:
         from .helper import print_load_table, print_dep_tree_rst
+
         print_load_table(load_stat)
     else:
         if bad_imports:
             if namespace != 'jina.hub':
                 default_logger.error(
                     f'theses modules or classes can not be imported {bad_imports}. '
-                    f'You can use `jina check` to list all executors and drivers')
+                    f'You can use `jina check` to list all executors and drivers'
+                )
             else:
                 default_logger.warning(
                     f'due to the missing dependencies or bad implementations, {bad_imports} can not be imported '
                     f'if you are using these executors/drivers, they wont work. '
-                    f'You can use `jina check` to list all executors and drivers')
+                    f'You can use `jina check` to list all executors and drivers'
+                )
 
     if namespace == 'jina.executors':
         JINA_GLOBAL.imported.executors = True
@@ -238,6 +271,7 @@ def set_nofile(nofile_atleast=4096):
         res = None
 
     from .logging import default_logger
+
     if res is None:
         return (None,) * 2
 
@@ -255,7 +289,9 @@ def set_nofile(nofile_atleast=4096):
         except (ValueError, res.error):
             try:
                 hard = soft
-                default_logger.warning(f'trouble with max limit, retrying with soft,hard {soft},{hard}')
+                default_logger.warning(
+                    f'trouble with max limit, retrying with soft,hard {soft},{hard}'
+                )
                 res.setrlimit(res.RLIMIT_NOFILE, (soft, hard))
             except Exception:
                 default_logger.warning('failed to set ulimit, giving up')

@@ -52,8 +52,11 @@ class PeaSpawnHelper(GrpcClient):
     def close(self):
         if not self.is_closed:
             if self.ctrl_addr:
-                send_ctrl_message(self.ctrl_addr, jina_pb2.Request.ControlRequest.TERMINATE,
-                                  timeout=self.timeout_shutdown)
+                send_ctrl_message(
+                    self.ctrl_addr,
+                    jina_pb2.Request.ControlRequest.TERMINATE,
+                    timeout=self.timeout_shutdown,
+                )
             super().close()
             self.is_closed = True
 
@@ -63,19 +66,23 @@ class PodSpawnHelper(PeaSpawnHelper):
 
     def __init__(self, args: 'argparse.Namespace'):
         super().__init__(args)
-        self.all_ctrl_addr = []  #: all peas control address and ports of this pod, need to be set in set_ready()
+        self.all_ctrl_addr = (
+            []
+        )  #: all peas control address and ports of this pod, need to be set in set_ready()
 
     def close(self):
         if not self.is_closed:
             for ctrl_addr in self.all_ctrl_addr:
-                send_ctrl_message(ctrl_addr, jina_pb2.Request.ControlRequest.TERMINATE,
-                                  timeout=self.timeout_shutdown)
+                send_ctrl_message(
+                    ctrl_addr,
+                    jina_pb2.Request.ControlRequest.TERMINATE,
+                    timeout=self.timeout_shutdown,
+                )
             GrpcClient.close(self)
             self.is_closed = True
 
 
 class MutablePodSpawnHelper(PodSpawnHelper):
-
     def __init__(self, peas_args: Dict):
         inited = False
         for k in peas_args.values():
@@ -114,10 +121,17 @@ def peas_args2mutable_pod_req(peas_args: Dict):
 
 def mutable_pod_req2peas_args(req):
     from ..parser import set_pea_parser
+
     return {
-        'head': set_pea_parser().parse_known_args(req.head.args)[0] if req.head.args else None,
-        'tail': set_pea_parser().parse_known_args(req.tail.args)[0] if req.tail.args else None,
-        'peas': [set_pea_parser().parse_known_args(q.args)[0] for q in req.peas] if req.peas else []
+        'head': set_pea_parser().parse_known_args(req.head.args)[0]
+        if req.head.args
+        else None,
+        'tail': set_pea_parser().parse_known_args(req.tail.args)[0]
+        if req.tail.args
+        else None,
+        'peas': [set_pea_parser().parse_known_args(q.args)[0] for q in req.peas]
+        if req.peas
+        else [],
     }
 
 
@@ -126,6 +140,7 @@ class RemotePea(BasePea):
 
     Useful in Jina CLI
     """
+
     remote_helper = PeaSpawnHelper
 
     def loop_body(self):
@@ -141,14 +156,17 @@ class RemotePod(RemotePea):
 
     Useful in Jina CLI
     """
+
     remote_helper = PodSpawnHelper
 
     def set_ready(self, resp):
         _rep = getattr(resp, resp.WhichOneof('body'))
         peas_args = mutable_pod_req2peas_args(_rep)
-        all_args = peas_args['peas'] + (
-            [peas_args['head']] if peas_args['head'] else []) + (
-                       [peas_args['tail']] if peas_args['tail'] else [])
+        all_args = (
+            peas_args['peas']
+            + ([peas_args['head']] if peas_args['head'] else [])
+            + ([peas_args['tail']] if peas_args['tail'] else [])
+        )
         for s in all_args:
             s.host = self.args.host
             self._remote.all_ctrl_addr.append(Zmqlet.get_ctrl_address(s)[0])
@@ -160,4 +178,5 @@ class RemoteMutablePod(RemotePea):
 
     Useful in Flow API
     """
+
     remote_helper = MutablePodSpawnHelper

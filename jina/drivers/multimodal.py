@@ -22,8 +22,7 @@ def _extract_doc_content(doc: 'jina_pb2.Document'):
 
 
 def _extract_modalities_from_document(doc: 'jina_pb2.Document'):
-    """Returns a dictionary of document content (embedding, text, blob or buffer) with `modality` as its key
-    """
+    """Returns a dictionary of document content (embedding, text, blob or buffer) with `modality` as its key"""
     doc_content = {}
     for chunk in doc.chunks:
         modality = chunk.modality
@@ -55,8 +54,7 @@ class MultiModalDriver(BaseEncodeDriver):
         - It assumes that every ``chunk`` of a ``document`` belongs to a different modality.
     """
 
-    def __init__(self,
-                 traversal_paths: Tuple[str] = ('r',), *args, **kwargs):
+    def __init__(self, traversal_paths: Tuple[str] = ('r',), *args, **kwargs):
         super().__init__(traversal_paths=traversal_paths, *args, **kwargs)
 
     @property
@@ -65,27 +63,29 @@ class MultiModalDriver(BaseEncodeDriver):
         :return: the list of strings representing the name and order of the modality.
         """
         if not self._exec.positional_modality:
-            raise RuntimeError('Could not know which position of the ndarray to load to each modality')
+            raise RuntimeError(
+                'Could not know which position of the ndarray to load to each modality'
+            )
         return self._exec.positional_modality
 
-    def _get_executor_input_arguments(self, content_by_modality: Dict[str, 'np.ndarray']):
+    def _get_executor_input_arguments(
+        self, content_by_modality: Dict[str, 'np.ndarray']
+    ):
         """
-            From a dictionary ``content_by_modality`` it returns the arguments in the proper order so that they can be
-            passed to the executor.
+        From a dictionary ``content_by_modality`` it returns the arguments in the proper order so that they can be
+        passed to the executor.
         """
         return [content_by_modality[modality] for modality in self.positional_modality]
 
-    def _apply_all(
-            self,
-            docs: Iterable['jina_pb2.Document'],
-            *args, **kwargs
-    ) -> None:
+    def _apply_all(self, docs: Iterable['jina_pb2.Document'], *args, **kwargs) -> None:
         """
         :param docs: the docs for which a ``multimodal embedding`` will be computed, whose chunks are of different
         modalities
         :return:
         """
-        content_by_modality = defaultdict(list)  # array of num_rows equal to num_docs and num_columns equal to
+        content_by_modality = defaultdict(
+            list
+        )  # array of num_rows equal to num_docs and num_columns equal to
 
         valid_docs = []
         for doc in docs:
@@ -95,7 +95,9 @@ class MultiModalDriver(BaseEncodeDriver):
                 for modality in self.positional_modality:
                     content_by_modality[modality].append(doc_content[modality])
             else:
-                self.logger.warning(f'Invalid doc {doc.id}. Only one chunk per modality is accepted')
+                self.logger.warning(
+                    f'Invalid doc {doc.id}. Only one chunk per modality is accepted'
+                )
 
         if len(valid_docs) > 0:
             # Pass a variable length argument (one argument per array)
@@ -108,6 +110,7 @@ class MultiModalDriver(BaseEncodeDriver):
             if len(valid_docs) != embeds.shape[0]:
                 self.logger.error(
                     f'mismatched {len(valid_docs)} docs from level {docs[0].granularity} '
-                    f'and a {embeds.shape} shape embedding, the first dimension must be the same')
+                    f'and a {embeds.shape} shape embedding, the first dimension must be the same'
+                )
             for doc, embedding in zip(valid_docs, embeds):
                 doc.embedding.CopyFrom(array2pb(embedding))

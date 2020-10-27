@@ -16,7 +16,7 @@ class MockPrecisionEvaluator(BaseRankingEvaluator):
 
     def evaluate(self, matches_ids, desired_ids, *args, **kwargs) -> float:
         ret = 0.0
-        for doc_id in matches_ids[:self.eval_at]:
+        for doc_id in matches_ids[: self.eval_at]:
             if doc_id in desired_ids:
                 ret += 1.0
 
@@ -62,9 +62,9 @@ def ground_truth_pairs():
     return pairs
 
 
-def test_ranking_evaluate_driver(mock_precision_evaluator,
-                                 simple_evaluate_driver,
-                                 ground_truth_pairs):
+def test_ranking_evaluate_driver(
+    mock_precision_evaluator, simple_evaluate_driver, ground_truth_pairs
+):
     simple_evaluate_driver.attach(executor=mock_precision_evaluator, pea=None)
     simple_evaluate_driver._apply_all(ground_truth_pairs)
     for pair in ground_truth_pairs:
@@ -75,7 +75,6 @@ def test_ranking_evaluate_driver(mock_precision_evaluator,
 
 
 class SimpleChunkEvaluateDriver(RankEvaluateDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.eval_request = None
@@ -119,9 +118,9 @@ def eval_request():
     return req
 
 
-def test_ranking_evaluate_driver_matches_in_chunks(simple_chunk_evaluate_driver,
-                                                   mock_precision_evaluator,
-                                                   eval_request):
+def test_ranking_evaluate_driver_matches_in_chunks(
+    simple_chunk_evaluate_driver, mock_precision_evaluator, eval_request
+):
     # this test proves that we can evaluate matches at chunk level,
     # proving that the driver can traverse in a parallel way docs and groundtruth
     simple_chunk_evaluate_driver.attach(executor=mock_precision_evaluator, pea=None)
@@ -135,7 +134,9 @@ def test_ranking_evaluate_driver_matches_in_chunks(simple_chunk_evaluate_driver,
         assert len(doc.chunks) == 1
         chunk = doc.chunks[0]
         assert len(chunk.evaluations) == 1  # evaluation done at chunk level
-        assert chunk.evaluations[0].op_name == 'SimpleChunkEvaluateDriver-MockPrecision@2'
+        assert (
+            chunk.evaluations[0].op_name == 'SimpleChunkEvaluateDriver-MockPrecision@2'
+        )
         assert chunk.evaluations[0].value == 1.0
 
 
@@ -163,9 +164,11 @@ def eval_request_with_unmatching_struct():
     return req
 
 
-def test_evaluate_assert_doc_groundtruth_structure(simple_chunk_evaluate_driver,
-                                                   mock_precision_evaluator,
-                                                   eval_request_with_unmatching_struct):
+def test_evaluate_assert_doc_groundtruth_structure(
+    simple_chunk_evaluate_driver,
+    mock_precision_evaluator,
+    eval_request_with_unmatching_struct,
+):
     simple_chunk_evaluate_driver.attach(executor=mock_precision_evaluator, pea=None)
     simple_chunk_evaluate_driver.eval_request = eval_request_with_unmatching_struct
     with pytest.raises(AssertionError):

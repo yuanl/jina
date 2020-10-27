@@ -5,15 +5,14 @@ from . import BaseTextEvaluator
 
 
 class TextLengthEvaluator(BaseTextEvaluator):
-    """A :class:`TextLengthEvaluator` evaluates the different lengths between actual and desired text
-    """
+    """A :class:`TextLengthEvaluator` evaluates the different lengths between actual and desired text"""
 
     @property
     def metric(self):
         return 'Length'
 
     def evaluate(self, actual: str, desired: str, *args, **kwargs) -> float:
-        """"
+        """ "
         :param actual: the text of the document
         :param desired: the expected text of the document
         :return the evaluation metric value for the request document

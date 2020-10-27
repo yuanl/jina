@@ -41,11 +41,14 @@ def test_multimodal_embedding_parallel(multimodal_documents):
     def validate_response(resp):
         assert len(resp.index.docs) == NUM_DOCS
         for idx, doc in enumerate(resp.index.docs):
-            np.testing.assert_almost_equal(pb2array(doc.embedding), np.array([idx, idx, idx, idx, idx]))
+            np.testing.assert_almost_equal(
+                pb2array(doc.embedding), np.array([idx, idx, idx, idx, idx])
+            )
 
-    with Flow().load_config(os.path.join(cur_dir, 'flow-embedding-multimodal-parallel.yml')) as index_gt_flow:
-        index_gt_flow.index(input_fn=multimodal_documents,
-                            output_fn=validate_response)
+    with Flow().load_config(
+        os.path.join(cur_dir, 'flow-embedding-multimodal-parallel.yml')
+    ) as index_gt_flow:
+        index_gt_flow.index(input_fn=multimodal_documents, output_fn=validate_response)
 
 
 @pytest.fixture
@@ -84,8 +87,13 @@ def test_multimodal_all_types_parallel(multimodal_all_types_documents):
     def validate_response(resp):
         assert len(resp.index.docs) == NUM_DOCS
         for idx, doc in enumerate(resp.index.docs):
-            np.testing.assert_almost_equal(pb2array(doc.embedding), np.array([idx, idx, idx, idx, idx, 3, 3, 4, 4]))
+            np.testing.assert_almost_equal(
+                pb2array(doc.embedding), np.array([idx, idx, idx, idx, idx, 3, 3, 4, 4])
+            )
 
-    with Flow().load_config(os.path.join(cur_dir, 'flow-multimodal-all-types-parallel.yml')) as index_gt_flow:
-        index_gt_flow.index(input_fn=multimodal_all_types_documents,
-                            output_fn=validate_response)
+    with Flow().load_config(
+        os.path.join(cur_dir, 'flow-multimodal-all-types-parallel.yml')
+    ) as index_gt_flow:
+        index_gt_flow.index(
+            input_fn=multimodal_all_types_documents, output_fn=validate_response
+        )

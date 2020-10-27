@@ -24,6 +24,7 @@ def test_logging_default():
         log(logger)
         try:
             import fluent
+
             assert len(logger.handlers) == 3
         except (ModuleNotFoundError, ImportError):
             # if fluent not installed
@@ -36,5 +37,3 @@ def test_logging_file():
     assert os.path.exists(f'jina-{__uptime__}.log')
     with open(f'jina-{__uptime__}.log') as fp:
         assert len(fp.readlines()) == 5
-
-

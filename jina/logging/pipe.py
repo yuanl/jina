@@ -14,7 +14,7 @@ if False:
 
 class PipeLogger:
     def __init__(self, args: 'argparse.Namespace'):
-        """ Start a pipe logger to beautify the log
+        """Start a pipe logger to beautify the log
 
         :param args: the parsed arguments from the CLI
         """
@@ -31,8 +31,13 @@ class PipeLogger:
                     self._preserved_logs[m.group(0)] = l, time.perf_counter()
                     os.system('cls' if os.name == 'nt' else 'clear')
                     now_time = time.perf_counter()
-                    for k, v in sorted(self._preserved_logs.items(), key=lambda x: x[1]):
-                        if self.args.refresh_time < 0 or (now_time - v[1]) < self.args.refresh_time:
+                    for k, v in sorted(
+                        self._preserved_logs.items(), key=lambda x: x[1]
+                    ):
+                        if (
+                            self.args.refresh_time < 0
+                            or (now_time - v[1]) < self.args.refresh_time
+                        ):
                             sys.stdout.write(v[0])
                 else:
                     sys.stdout.write(l)

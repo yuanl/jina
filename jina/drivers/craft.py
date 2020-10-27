@@ -20,7 +20,9 @@ class CraftDriver(BaseExecutableDriver):
             if ret:
                 self.set_doc_attr(doc, ret)
 
-    def set_doc_attr(self, doc: 'jina_pb2.Document', doc_info: Dict, protected_keys: Set = None):
+    def set_doc_attr(
+        self, doc: 'jina_pb2.Document', doc_info: Dict, protected_keys: Set = None
+    ):
         for k, v in doc_info.items():
             if k == 'blob':
                 if isinstance(v, jina_pb2.NdArray):
@@ -28,9 +30,11 @@ class CraftDriver(BaseExecutableDriver):
                 else:
                     doc.blob.CopyFrom(array2pb(v))
             elif isinstance(protected_keys, dict) and k in protected_keys:
-                self.logger.warning(f'you are assigning a {k} in {self.exec.__class__}, '
-                                    f'is it intentional? {k} will be overwritten by {self.__class__} '
-                                    f'anyway.')
+                self.logger.warning(
+                    f'you are assigning a {k} in {self.exec.__class__}, '
+                    f'is it intentional? {k} will be overwritten by {self.__class__} '
+                    f'anyway.'
+                )
             elif isinstance(v, list) or isinstance(v, tuple):
                 doc.ClearField(k)
                 getattr(doc, k).extend(v)
@@ -41,15 +45,9 @@ class CraftDriver(BaseExecutableDriver):
 
 
 class SegmentDriver(CraftDriver):
-    """Segment document into chunks using the executor
-    """
+    """Segment document into chunks using the executor"""
 
-    def __init__(
-            self,
-            traversal_paths: Tuple[str] = ('r',),
-            *args,
-            **kwargs
-    ):
+    def __init__(self, traversal_paths: Tuple[str] = ('r',), *args, **kwargs):
         super().__init__(traversal_paths=traversal_paths, *args, **kwargs)
 
         self._protected_fields = {'length', 'id', 'parent_id', 'granularity'}
@@ -70,4 +68,6 @@ class SegmentDriver(CraftDriver):
                     c.id = uid.new_doc_id(c)
 
             else:
-                self.logger.warning(f'doc {doc.id} at level {doc.granularity} gives no chunk')
+                self.logger.warning(
+                    f'doc {doc.id} at level {doc.granularity} gives no chunk'
+                )

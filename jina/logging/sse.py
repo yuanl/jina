@@ -35,9 +35,11 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
         from gevent.pywsgi import WSGIServer
         import gevent
     except ImportError:
-        raise ImportError('Flask or its dependencies are not fully installed, '
-                          'they are required for serving HTTP requests.'
-                          'Please use pip install "jina[http]" to install it.')
+        raise ImportError(
+            'Flask or its dependencies are not fully installed, '
+            'they are required for serving HTTP requests.'
+            'Please use pip install "jina[http]" to install it.'
+        )
 
     try:
         with open(server_config_path) as fp:
@@ -46,10 +48,12 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
         default_logger.error(ex)
     JINA_GLOBAL.logserver.address = f'http://{_config["host"]}:{_config["port"]}'
 
-    JINA_GLOBAL.logserver.ready = JINA_GLOBAL.logserver.address + \
-                                  _config['endpoints']['ready']
-    JINA_GLOBAL.logserver.shutdown = JINA_GLOBAL.logserver.address + \
-                                     _config['endpoints']['shutdown']
+    JINA_GLOBAL.logserver.ready = (
+        JINA_GLOBAL.logserver.address + _config['endpoints']['ready']
+    )
+    JINA_GLOBAL.logserver.shutdown = (
+        JINA_GLOBAL.logserver.address + _config['endpoints']['shutdown']
+    )
 
     app = Flask(__name__)
     CORS(app)
@@ -57,6 +61,7 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
 
     def _log_stream(path):
         import glob
+
         # fluentd creates files under this path with some tag based on day, so as temp solution,
         # just get the first file matching this patter once it appears
         while len(glob.glob(f'{path}*.log')) == 0:
@@ -75,7 +80,9 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
     @app.route(_config['endpoints']['log'])
     def get_log():
         """Get the logs, endpoint `/log/stream`  """
-        return Response(_log_stream(_config['files']['log']), mimetype="text/event-stream")
+        return Response(
+            _log_stream(_config['files']['log']), mimetype="text/event-stream"
+        )
 
     @app.route(_config['endpoints']['yaml'])
     def get_yaml():
@@ -85,7 +92,9 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
     @app.route(_config['endpoints']['profile'])
     def get_profile():
         """Get the profile logs, endpoint `/profile/stream`  """
-        return Response(_log_stream(_config['files']['profile']), mimetype='text/event-stream')
+        return Response(
+            _log_stream(_config['files']['profile']), mimetype='text/event-stream'
+        )
 
     @app.route(_config['endpoints']['podapi'])
     def get_podargs():
@@ -93,6 +102,7 @@ def start_sse_logger(server_config_path: str, flow_yaml: str = None):
 
         from ..parser import set_pod_parser
         from argparse import _StoreAction, _StoreTrueAction
+
         port_attr = ('help', 'choices', 'default')
         d = {}
         parser = set_pod_parser()

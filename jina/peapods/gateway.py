@@ -43,7 +43,9 @@ class GatewayPea:
         os.environ['JINA_POD_NAME'] = 'gateway'
         self.logger = JinaLogger(self.__class__.__name__, **vars(args))
         if args.allow_spawn:
-            self.logger.critical('SECURITY ALERT! this gateway allows SpawnRequest from remote Jina')
+            self.logger.critical(
+                'SECURITY ALERT! this gateway allows SpawnRequest from remote Jina'
+            )
         self._p_servicer = self._Pea(args)
         self._stop_event = threading.Event()
         self.is_ready = threading.Event()
@@ -53,8 +55,11 @@ class GatewayPea:
         self._ae = AsyncioExecutor()
         self._server = grpc.server(
             self._ae,
-            options=[('grpc.max_send_message_length', args.max_message_size),
-                     ('grpc.max_receive_message_length', args.max_message_size)])
+            options=[
+                ('grpc.max_send_message_length', args.max_message_size),
+                ('grpc.max_receive_message_length', args.max_message_size),
+            ],
+        )
 
         jina_pb2_grpc.add_JinaRPCServicer_to_server(self._p_servicer, self._server)
         self._bind_address = f'{args.host}:{args.port_expose}'
@@ -87,7 +92,6 @@ class GatewayPea:
             pass
 
     class _Pea(jina_pb2_grpc.JinaRPCServicer):
-
         def __init__(self, args):
             super().__init__()
             self.args = args
@@ -121,7 +125,9 @@ class GatewayPea:
                 self._request = getattr(msg.request, msg.request.WhichOneof('body'))
                 self._message = msg
                 if msg.envelope.num_part != [1]:
-                    raise GatewayPartialMessage(f'gateway can not handle message with num_part={msg.envelope.num_part}')
+                    raise GatewayPartialMessage(
+                        f'gateway can not handle message with num_part={msg.envelope.num_part}'
+                    )
                 # self.executor(self.request_type)
                 # envelope will be dropped when returning to the client
             except NoDriverForRequest:
@@ -143,8 +149,14 @@ class GatewayPea:
 
         async def CallUnary(self, request, context):
             with AsyncZmqlet(self.args, logger=self.logger) as zmqlet:
-                await zmqlet.send_message(add_envelope(request, 'gateway', zmqlet.args.identity,
-                                                       num_part=self.args.num_part))
+                await zmqlet.send_message(
+                    add_envelope(
+                        request,
+                        'gateway',
+                        zmqlet.args.identity,
+                        num_part=self.args.num_part,
+                    )
+                )
                 return await zmqlet.recv_message(callback=self.handle)
 
         async def Call(self, request_iterator, context):
@@ -159,31 +171,51 @@ class GatewayPea:
                         try:
                             asyncio.create_task(
                                 zmqlet.send_message(
-                                    add_envelope(next(request_iterator), 'gateway', zmqlet.args.identity,
-                                                 num_part=self.args.num_part)))
-                            fetch_to.append(asyncio.create_task(zmqlet.recv_message(callback=self.handle)))
+                                    add_envelope(
+                                        next(request_iterator),
+                                        'gateway',
+                                        zmqlet.args.identity,
+                                        num_part=self.args.num_part,
+                                    )
+                                )
+                            )
+                            fetch_to.append(
+                                asyncio.create_task(
+                                    zmqlet.recv_message(callback=self.handle)
+                                )
+                            )
                         except StopIteration:
                             return True
                     return False
 
-                with TimeContext(f'prefetching {self.args.prefetch} requests', self.logger):
-                    self.logger.warning('if this takes too long, you may want to take smaller "--prefetch" or '
-                                        'ask client to reduce "--batch-size"')
+                with TimeContext(
+                    f'prefetching {self.args.prefetch} requests', self.logger
+                ):
+                    self.logger.warning(
+                        'if this takes too long, you may want to take smaller "--prefetch" or '
+                        'ask client to reduce "--batch-size"'
+                    )
                     is_req_empty = prefetch_req(self.args.prefetch, prefetch_task)
                     if is_req_empty and not prefetch_task:
-                        self.logger.error('receive an empty stream from the client! '
-                                          'please check your client\'s input_fn, '
-                                          'you can use "PyClient.check_input(input_fn())"')
+                        self.logger.error(
+                            'receive an empty stream from the client! '
+                            'please check your client\'s input_fn, '
+                            'you can use "PyClient.check_input(input_fn())"'
+                        )
                         return
 
                 while not (zmqlet.msg_sent == zmqlet.msg_recv != 0 and is_req_empty):
-                    self.logger.info(f'send: {zmqlet.msg_sent} '
-                                     f'recv: {zmqlet.msg_recv} '
-                                     f'pending: {zmqlet.msg_sent - zmqlet.msg_recv}')
+                    self.logger.info(
+                        f'send: {zmqlet.msg_sent} '
+                        f'recv: {zmqlet.msg_recv} '
+                        f'pending: {zmqlet.msg_sent - zmqlet.msg_recv}'
+                    )
                     onrecv_task.clear()
                     for r in asyncio.as_completed(prefetch_task):
                         yield await r
-                        is_req_empty = prefetch_req(self.args.prefetch_on_recv, onrecv_task)
+                        is_req_empty = prefetch_req(
+                            self.args.prefetch_on_recv, onrecv_task
+                        )
                     prefetch_task.clear()
                     prefetch_task = [j for j in onrecv_task]
 
@@ -191,6 +223,7 @@ class GatewayPea:
             _req = getattr(request, request.WhichOneof('body'))
             if self.args.allow_spawn:
                 from . import Pea, Pod
+
                 _req_type = type(_req)
                 if _req_type == jina_pb2.SpawnRequest.PeaSpawnRequest:
                     _args = set_pea_parser().parse_known_args(_req.args)[0]
@@ -204,9 +237,11 @@ class GatewayPea:
                     # we do not allow remote spawn request to spawn a "remote-remote" pea/pod
                     p = Pod(_args, allow_remote=False)
                     from .remote import peas_args2mutable_pod_req
+
                     request = peas_args2mutable_pod_req(p.peas_args)
                 elif _req_type == jina_pb2.SpawnRequest.MutablepodSpawnRequest:
                     from .remote import mutable_pod_req2peas_args
+
                     p = Pod(mutable_pod_req2peas_args(_req), allow_remote=False)
                 else:
                     raise BadRequestType('don\'t know how to handle %r' % _req_type)
@@ -218,8 +253,10 @@ class GatewayPea:
                         yield request
                 self.peapods.remove(p)
             else:
-                warn_msg = f'the gateway at {self.args.host}:{self.args.port_expose} ' \
-                           f'does not support remote spawn, please restart it with --allow-spawn'
+                warn_msg = (
+                    f'the gateway at {self.args.host}:{self.args.port_expose} '
+                    f'does not support remote spawn, please restart it with --allow-spawn'
+                )
                 request.log_record = warn_msg
                 request.status.code = jina_pb2.Status.ERROR_NOTALLOWED
                 request.status.description = warn_msg
@@ -254,9 +291,11 @@ class RESTGatewayPea(BasePea):
             from flask_cors import CORS, cross_origin
             from gevent.pywsgi import WSGIServer
         except ImportError:
-            raise ImportError('Flask or its dependencies are not fully installed, '
-                              'they are required for serving HTTP requests.'
-                              'Please use pip install "jina[http]" to install it.')
+            raise ImportError(
+                'Flask or its dependencies are not fully installed, '
+                'they are required for serving HTTP requests.'
+                'Please use pip install "jina[http]" to install it.'
+            )
         app = Flask(__name__)
         app.config['CORS_HEADERS'] = 'Content-Type'
         CORS(app)
@@ -273,6 +312,7 @@ class RESTGatewayPea(BasePea):
         @cross_origin()
         def api(mode):
             from ..clients import python
+
             mode_fn = getattr(python.request, mode, None)
             if mode_fn is None:
                 return http_error(f'mode: {mode} is not supported yet', 405)
@@ -283,12 +323,14 @@ class RESTGatewayPea(BasePea):
             content['mode'] = ClientMode.from_string(mode)
 
             results = get_result_in_json(getattr(python.request, mode)(**content))
-            return Response(asyncio.run(results),
-                            status=200,
-                            mimetype='application/json')
+            return Response(
+                asyncio.run(results), status=200, mimetype='application/json'
+            )
 
         async def get_result_in_json(req_iter):
-            return [MessageToJson(k) async for k in self._p_servicer.Call(req_iter, None)]
+            return [
+                MessageToJson(k) async for k in self._p_servicer.Call(req_iter, None)
+            ]
 
         # os.environ['WERKZEUG_RUN_MAIN'] = 'true'
         # log = logging.getLogger('werkzeug')
@@ -304,9 +346,12 @@ class RESTGatewayPea(BasePea):
             self.is_shutdown.set()
 
         from gevent import signal
+
         signal.signal(signal.SIGTERM, close)
         signal.signal(signal.SIGINT, close)  # CTRL C
         self.set_ready()
-        self.logger.warning('you are using a REST gateway, which is still in early beta version. '
-                            'advanced features such as prefetch and streaming are disabled.')
+        self.logger.warning(
+            'you are using a REST gateway, which is still in early beta version. '
+            'advanced features such as prefetch and streaming are disabled.'
+        )
         server.serve_forever()

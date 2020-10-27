@@ -41,7 +41,7 @@ class BaseCacheDriver(BaseIndexDriver):
             self.exec_fn(doc.id)
 
     def on_hit(self, req_doc: 'jina_pb2.Document', hit_result: Any) -> None:
-        """ Function to call when doc is hit
+        """Function to call when doc is hit
 
         :param req_doc: the document in the request and hitted in the cache
         :param hit_result: the hit result returned by the cache

@@ -20,16 +20,20 @@ def used_memory(unit: int = 1024 * 1024 * 1024) -> float:
     """
     try:
         import resource
+
         return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / unit
     except ModuleNotFoundError:
         from . import default_logger
-        default_logger.error('module "resource" can not be found and you are likely running it on Windows, '
-                             'i will return 0')
+
+        default_logger.error(
+            'module "resource" can not be found and you are likely running it on Windows, '
+            'i will return 0'
+        )
         return 0
 
 
 def used_memory_readable() -> str:
-    """ Get the memory usage of the current process in a human-readable format
+    """Get the memory usage of the current process in a human-readable format
 
     :return:
     """
@@ -61,7 +65,9 @@ def profiling(func):
         # level_prefix = ''.join('-' for v in inspect.stack() if v and v.index is not None and v.index >= 0)
         level_prefix = ''
         mem_status = f'memory Δ {get_readable_size(end_mem - start_mem)} {get_readable_size(start_mem)} -> {get_readable_size(end_mem)}'
-        default_logger.info(f'{level_prefix} {func.__qualname__} time: {elapsed}s {mem_status}')
+        default_logger.info(
+            f'{level_prefix} {func.__qualname__} time: {elapsed}s {mem_status}'
+        )
         return r
 
     return arg_wrapper
@@ -154,6 +160,13 @@ class TimeContext:
 
     def _exit_msg(self):
         if self._logger:
-            self._logger.info(f'{self.task_name} takes {self.readable_duration} ({self.duration:.2f}s)')
+            self._logger.info(
+                f'{self.task_name} takes {self.readable_duration} ({self.duration:.2f}s)'
+            )
         else:
-            print(colored(f'    {self.readable_duration} ({self.duration:.2f}s)', 'green'), flush=True)
+            print(
+                colored(
+                    f'    {self.readable_duration} ({self.duration:.2f}s)', 'green'
+                ),
+                flush=True,
+            )

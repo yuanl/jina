@@ -11,7 +11,6 @@ from tests import random_docs
 
 
 class MockCacheDriver(BaseCacheDriver):
-
     @property
     def exec_fn(self):
         return self._exec_fn

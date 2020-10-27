@@ -49,10 +49,15 @@ class Zmqlet:
         if args.compress_hwm > 0:
             try:
                 import lz4
-                self.logger.success(f'compression is enabled and the high watermark is {args.compress_hwm} bytes')
+
+                self.logger.success(
+                    f'compression is enabled and the high watermark is {args.compress_hwm} bytes'
+                )
             except ModuleNotFoundError:
-                self.logger.error(f'compression is enabled but you do not have lz4 package. '
-                                  f'use pip install "jina[lz4]" to install this dependency')
+                self.logger.error(
+                    f'compression is enabled but you do not have lz4 package. '
+                    f'use pip install "jina[lz4]" to install this dependency'
+                )
                 args.compress_hwm = -1  # disable the compression
         self.send_recv_kwargs = vars(args)
         self.ctrl_addr, self.ctrl_with_ipc = self.get_ctrl_address(args)
@@ -132,32 +137,58 @@ class Zmqlet:
         self.logger.info('setting up sockets...')
         try:
             if self.ctrl_with_ipc:
-                ctrl_sock, ctrl_addr = _init_socket(ctx, self.ctrl_addr, None, SocketType.PAIR_BIND,
-                                                    use_ipc=self.ctrl_with_ipc)
+                ctrl_sock, ctrl_addr = _init_socket(
+                    ctx,
+                    self.ctrl_addr,
+                    None,
+                    SocketType.PAIR_BIND,
+                    use_ipc=self.ctrl_with_ipc,
+                )
             else:
-                ctrl_sock, ctrl_addr = _init_socket(ctx, __default_host__, self.args.port_ctrl, SocketType.PAIR_BIND)
+                ctrl_sock, ctrl_addr = _init_socket(
+                    ctx, __default_host__, self.args.port_ctrl, SocketType.PAIR_BIND
+                )
             self.logger.debug(f'control over {colored(ctrl_addr, "yellow")}')
 
-            in_sock, in_addr = _init_socket(ctx, self.args.host_in, self.args.port_in, self.args.socket_in,
-                                            self.args.identity,
-                                            ssh_server=self.args.ssh_server,
-                                            ssh_keyfile=self.args.ssh_keyfile,
-                                            ssh_password=self.args.ssh_password)
-            self.logger.debug(f'input {self.args.host_in}:{colored(self.args.port_in, "yellow")}')
+            in_sock, in_addr = _init_socket(
+                ctx,
+                self.args.host_in,
+                self.args.port_in,
+                self.args.socket_in,
+                self.args.identity,
+                ssh_server=self.args.ssh_server,
+                ssh_keyfile=self.args.ssh_keyfile,
+                ssh_password=self.args.ssh_password,
+            )
+            self.logger.debug(
+                f'input {self.args.host_in}:{colored(self.args.port_in, "yellow")}'
+            )
 
-            out_sock, out_addr = _init_socket(ctx, self.args.host_out, self.args.port_out, self.args.socket_out,
-                                              self.args.identity,
-                                              ssh_server=self.args.ssh_server,
-                                              ssh_keyfile=self.args.ssh_keyfile,
-                                              ssh_password=self.args.ssh_password
-                                              )
-            self.logger.debug(f'output {self.args.host_out}:{colored(self.args.port_out, "yellow")}')
+            out_sock, out_addr = _init_socket(
+                ctx,
+                self.args.host_out,
+                self.args.port_out,
+                self.args.socket_out,
+                self.args.identity,
+                ssh_server=self.args.ssh_server,
+                ssh_keyfile=self.args.ssh_keyfile,
+                ssh_password=self.args.ssh_password,
+            )
+            self.logger.debug(
+                f'output {self.args.host_out}:{colored(self.args.port_out, "yellow")}'
+            )
 
             self.logger.info(
-                'input %s (%s) \t output %s (%s)\t control over %s (%s)' %
-                (colored(in_addr, 'yellow'), self.args.socket_in,
-                 colored(out_addr, 'yellow'), self.args.socket_out,
-                 colored(ctrl_addr, 'yellow'), SocketType.PAIR_BIND))
+                'input %s (%s) \t output %s (%s)\t control over %s (%s)'
+                % (
+                    colored(in_addr, 'yellow'),
+                    self.args.socket_in,
+                    colored(out_addr, 'yellow'),
+                    self.args.socket_out,
+                    colored(ctrl_addr, 'yellow'),
+                    SocketType.PAIR_BIND,
+                )
+            )
 
             self.in_sock_type = in_sock.type
             self.out_sock_type = out_sock.type
@@ -189,14 +220,20 @@ class Zmqlet:
 
     def print_stats(self):
         """Print out the network stats of of itself """
-        self.logger.info(f'#sent: {self.msg_sent} '
-                         f'#recv: {self.msg_recv} '
-                         f'sent_size: {get_readable_size(self.bytes_sent)} '
-                         f'recv_size: {get_readable_size(self.bytes_recv)}')
-        profile_logger.info({'msg_sent': self.msg_sent,
-                             'msg_recv': self.msg_recv,
-                             'bytes_sent': self.bytes_sent,
-                             'bytes_recv': self.bytes_recv})
+        self.logger.info(
+            f'#sent: {self.msg_sent} '
+            f'#recv: {self.msg_recv} '
+            f'sent_size: {get_readable_size(self.bytes_sent)} '
+            f'recv_size: {get_readable_size(self.bytes_recv)}'
+        )
+        profile_logger.info(
+            {
+                'msg_sent': self.msg_sent,
+                'msg_recv': self.msg_recv,
+                'bytes_sent': self.bytes_sent,
+                'bytes_recv': self.bytes_recv,
+            }
+        )
 
     def send_message(self, msg: 'jina_pb2.Message'):
         """Send a message via the output socket
@@ -230,7 +267,9 @@ class Zmqlet:
         self.msg_sent += 1
         self.logger.debug('idle and i told the router')
 
-    def recv_message(self, callback: Callable[['jina_pb2.Message'], None] = None) -> 'jina_pb2.Message':
+    def recv_message(
+        self, callback: Callable[['jina_pb2.Message'], None] = None
+    ) -> 'jina_pb2.Message':
         """Receive a protobuf message from the input socket
 
         :param callback: the callback function, which modifies the recevied message inplace.
@@ -269,15 +308,21 @@ class AsyncZmqlet(Zmqlet):
         """
         # await asyncio.sleep(sleep)  # preventing over-speed sending
         try:
-            num_bytes = await send_message_async(self.out_sock, msg, **self.send_recv_kwargs)
+            num_bytes = await send_message_async(
+                self.out_sock, msg, **self.send_recv_kwargs
+            )
             self.bytes_sent += num_bytes
             self.msg_sent += 1
         except (asyncio.CancelledError, TypeError) as ex:
             self.logger.error(f'sending message error: {ex}, gateway cancelled?')
 
-    async def recv_message(self, callback: Callable[['jina_pb2.Message'], None] = None) -> 'jina_pb2.Message':
+    async def recv_message(
+        self, callback: Callable[['jina_pb2.Message'], None] = None
+    ) -> 'jina_pb2.Message':
         try:
-            msg, num_bytes = await recv_message_async(self.in_sock, **self.send_recv_kwargs)
+            msg, num_bytes = await recv_message_async(
+                self.in_sock, **self.send_recv_kwargs
+            )
             self.bytes_recv += num_bytes
             self.msg_recv += 1
             if callback:
@@ -286,7 +331,7 @@ class AsyncZmqlet(Zmqlet):
             self.logger.error(f'receiving message error: {ex}, gateway cancelled?')
 
     def __enter__(self):
-        time.sleep(.2)  # sleep a bit until handshake is done
+        time.sleep(0.2)  # sleep a bit until handshake is done
         return self
 
 
@@ -302,14 +347,18 @@ class ZmqStreamlet(Zmqlet):
     def register_pollin(self):
         use_uvloop()
         import asyncio
+
         asyncio.set_event_loop(asyncio.new_event_loop())
         try:
             import tornado.ioloop
+
             self.io_loop = tornado.ioloop.IOLoop.current()
         except (ModuleNotFoundError, ImportError):
-            self.logger.error('Since v0.3.6 Jina requires "tornado" as a base dependency, '
-                              'we use its I/O event loop for non-blocking sockets. '
-                              'Please try reinstall via "pip install -U jina" to include this dependency')
+            self.logger.error(
+                'Since v0.3.6 Jina requires "tornado" as a base dependency, '
+                'we use its I/O event loop for non-blocking sockets. '
+                'Please try reinstall via "pip install -U jina" to include this dependency'
+            )
             raise
         self.in_sock = ZMQStream(self.in_sock, self.io_loop)
         self.out_sock = ZMQStream(self.out_sock, self.io_loop)
@@ -320,7 +369,7 @@ class ZmqStreamlet(Zmqlet):
         """Close all sockets and shutdown the ZMQ context associated to this `Zmqlet`. """
         if not self.is_closed:
             # wait until the close signal is received
-            time.sleep(.01)
+            time.sleep(0.01)
             for s in self.opened_socks:
                 s.flush()
             super().close()
@@ -366,7 +415,9 @@ class ZmqStreamlet(Zmqlet):
         self.io_loop.close(all_fds=True)
 
 
-def send_ctrl_message(address: str, cmd: 'jina_pb2.Request.ControlRequest', timeout: int):
+def send_ctrl_message(
+    address: str, cmd: 'jina_pb2.Request.ControlRequest', timeout: int
+):
     """Send a control message to a specific address and wait for the response
 
     :param address: the socket address to send
@@ -391,8 +442,14 @@ def send_ctrl_message(address: str, cmd: 'jina_pb2.Request.ControlRequest', time
         return r
 
 
-def send_message(sock: Union['zmq.Socket', 'ZMQStream'], msg: 'jina_pb2.Message', timeout: int = -1,
-                 compress_hwm: float = -1, compress_lwm: float = 1., **kwargs) -> int:
+def send_message(
+    sock: Union['zmq.Socket', 'ZMQStream'],
+    msg: 'jina_pb2.Message',
+    timeout: int = -1,
+    compress_hwm: float = -1,
+    compress_lwm: float = 1.0,
+    **kwargs,
+) -> int:
     """Send a protobuf message to a socket
 
     :param sock: the target socket to send
@@ -410,8 +467,9 @@ def send_message(sock: Union['zmq.Socket', 'ZMQStream'], msg: 'jina_pb2.Message'
     except zmq.error.Again:
         raise TimeoutError(
             'cannot send message to sock %s after timeout=%dms, please check the following:'
-            'is the server still online? is the network broken? are "port" correct? ' % (
-                sock, timeout))
+            'is the server still online? is the network broken? are "port" correct? '
+            % (sock, timeout)
+        )
     except zmq.error.ZMQError as ex:
         default_logger.critical(ex)
     finally:
@@ -428,15 +486,19 @@ def _prep_send_msg(compress_hwm, compress_lwm, msg, sock, timeout):
         sock.setsockopt(zmq.SNDTIMEO, timeout)
     else:
         sock.setsockopt(zmq.SNDTIMEO, -1)
-    return _serialize_to_frames(msg.envelope.receiver_id,
-                                msg,
-                                compress_hwm,
-                                compress_lwm)
+    return _serialize_to_frames(
+        msg.envelope.receiver_id, msg, compress_hwm, compress_lwm
+    )
 
 
-async def send_message_async(sock: 'zmq.Socket', msg: 'jina_pb2.Message', timeout: int = -1,
-                             compress_hwm: float = -1, compress_lwm: float = 1.,
-                             **kwargs) -> int:
+async def send_message_async(
+    sock: 'zmq.Socket',
+    msg: 'jina_pb2.Message',
+    timeout: int = -1,
+    compress_hwm: float = -1,
+    compress_lwm: float = 1.0,
+    **kwargs,
+) -> int:
     """Send a protobuf message to a socket in async manner
 
     :param sock: the target socket to send
@@ -455,8 +517,9 @@ async def send_message_async(sock: 'zmq.Socket', msg: 'jina_pb2.Message', timeou
     except zmq.error.Again:
         raise TimeoutError(
             'cannot send message to sock %s after timeout=%dms, please check the following:'
-            'is the server still online? is the network broken? are "port" correct? ' % (
-                sock, timeout))
+            'is the server still online? is the network broken? are "port" correct? '
+            % (sock, timeout)
+        )
     except zmq.error.ZMQError as ex:
         default_logger.critical(ex)
     except asyncio.CancelledError:
@@ -470,9 +533,10 @@ async def send_message_async(sock: 'zmq.Socket', msg: 'jina_pb2.Message', timeou
             pass
 
 
-def recv_message(sock: 'zmq.Socket', timeout: int = -1, check_version: bool = False, **kwargs) -> Tuple[
-    'jina_pb2.Message', int]:
-    """ Receive a protobuf message from a socket
+def recv_message(
+    sock: 'zmq.Socket', timeout: int = -1, check_version: bool = False, **kwargs
+) -> Tuple['jina_pb2.Message', int]:
+    """Receive a protobuf message from a socket
 
     :param sock: the socket to pull from
     :param timeout: max wait time for pulling, -1 means wait forever
@@ -495,17 +559,19 @@ def recv_message(sock: 'zmq.Socket', timeout: int = -1, check_version: bool = Fa
     except zmq.error.Again:
         raise TimeoutError(
             'no response from sock %s after timeout=%dms, please check the following:'
-            'is the server still online? is the network broken? are "port" correct? ' % (
-                sock, timeout))
+            'is the server still online? is the network broken? are "port" correct? '
+            % (sock, timeout)
+        )
     except Exception as ex:
         raise ex
     finally:
         sock.setsockopt(zmq.RCVTIMEO, -1)
 
 
-async def recv_message_async(sock: 'zmq.Socket', timeout: int = -1, check_version: bool = False, **kwargs) -> Tuple[
-    'jina_pb2.Message', int]:
-    """ Receive a protobuf message from a socket in async manner
+async def recv_message_async(
+    sock: 'zmq.Socket', timeout: int = -1, check_version: bool = False, **kwargs
+) -> Tuple['jina_pb2.Message', int]:
+    """Receive a protobuf message from a socket in async manner
 
     :param sock: the socket to pull from
     :param timeout: max wait time for pulling, -1 means wait forever
@@ -529,8 +595,9 @@ async def recv_message_async(sock: 'zmq.Socket', timeout: int = -1, check_versio
     except zmq.error.Again:
         raise TimeoutError(
             'no response from sock %s after timeout=%dms, please check the following:'
-            'is the server still online? is the network broken? are "port" correct? ' % (
-                sock, timeout))
+            'is the server still online? is the network broken? are "port" correct? '
+            % (sock, timeout)
+        )
     except zmq.error.ZMQError as ex:
         default_logger.critical(ex)
     except asyncio.CancelledError:
@@ -544,8 +611,9 @@ async def recv_message_async(sock: 'zmq.Socket', timeout: int = -1, check_versio
             pass
 
 
-def _serialize_to_frames(client_id, msg: 'jina_pb2.Message',
-                         compress_hwm: float, compress_lwm: float) -> Tuple[List[bytes], int]:
+def _serialize_to_frames(
+    client_id, msg: 'jina_pb2.Message', compress_hwm: float, compress_lwm: float
+) -> Tuple[List[bytes], int]:
     """
     Serialize a :class:`jina_pb2.Message` object into a list of frames. The list of frames (has length >=3) has the following structure:
 
@@ -564,16 +632,21 @@ def _serialize_to_frames(client_id, msg: 'jina_pb2.Message',
     _size_before = sum(sys.getsizeof(m) for m in _body)
     if _size_before > compress_hwm > 0:
         import lz4.frame
+
         body = [lz4.frame.compress(m) for m in _body]
         is_compressed = b'1'
         _size_after = sum(sys.getsizeof(m) for m in body)
         rate = _size_after / _size_before
-        default_logger.debug(f'compressed, before: {_size_before} after: {_size_after}, '
-                             f'ratio: {(_size_after / _size_before * 100):.0f}%')
+        default_logger.debug(
+            f'compressed, before: {_size_before} after: {_size_after}, '
+            f'ratio: {(_size_after / _size_before * 100):.0f}%'
+        )
         if rate > compress_lwm:
             body = _body
             is_compressed = b'0'
-            default_logger.debug(f'ineffective compression as the rate {rate:.2f} is higher than {compress_lwm}')
+            default_logger.debug(
+                f'ineffective compression as the rate {rate:.2f} is higher than {compress_lwm}'
+            )
     else:
         body = _body
         is_compressed = b'0'
@@ -585,7 +658,9 @@ def _serialize_to_frames(client_id, msg: 'jina_pb2.Message',
     return frames, num_bytes
 
 
-def _parse_from_frames(sock_type, frames: List[bytes], check_version: bool) -> Tuple['jina_pb2.Message', int]:
+def _parse_from_frames(
+    sock_type, frames: List[bytes], check_version: bool
+) -> Tuple['jina_pb2.Message', int]:
     """
     Build :class:`jina_pb2.Message` from a list of frames.
 
@@ -613,6 +688,7 @@ def _parse_from_frames(sock_type, frames: List[bytes], check_version: bool) -> T
     if frames[1] == b'1':
         # body message is compressed
         import lz4.frame
+
         for l in range(2, len(frames)):
             frames[l] = lz4.frame.decompress(frames[l])
 
@@ -631,17 +707,26 @@ def _get_random_ipc() -> str:
     try:
         tmp = os.environ['JINA_IPC_SOCK_TMP']
         if not os.path.exists(tmp):
-            raise ValueError(f'This directory for sockets ({tmp}) does not seems to exist.')
+            raise ValueError(
+                f'This directory for sockets ({tmp}) does not seems to exist.'
+            )
         tmp = os.path.join(tmp, get_random_identity())
     except KeyError:
         tmp = tempfile.NamedTemporaryFile().name
     return f'ipc://{tmp}'
 
 
-def _init_socket(ctx: 'zmq.Context', host: str, port: int,
-                 socket_type: 'SocketType', identity: 'str' = None,
-                 use_ipc: bool = False, ssh_server: str = None,
-                 ssh_keyfile: str = None, ssh_password: str = None) -> Tuple['zmq.Socket', str]:
+def _init_socket(
+    ctx: 'zmq.Context',
+    host: str,
+    port: int,
+    socket_type: 'SocketType',
+    identity: 'str' = None,
+    use_ipc: bool = False,
+    ssh_server: str = None,
+    ssh_keyfile: str = None,
+    ssh_password: str = None,
+) -> Tuple['zmq.Socket', str]:
     sock = {
         SocketType.PULL_BIND: lambda: ctx.socket(zmq.PULL),
         SocketType.PULL_CONNECT: lambda: ctx.socket(zmq.PULL),
@@ -671,7 +756,8 @@ def _init_socket(ctx: 'zmq.Context', host: str, port: int,
             # JEP2, if it is bind, then always bind to local
             if host != __default_host__:
                 default_logger.warning(
-                    f'host is set from {host} to {__default_host__} as the socket is in BIND type')
+                    f'host is set from {host} to {__default_host__} as the socket is in BIND type'
+                )
                 host = __default_host__
             if port is None:
                 sock.bind_to_random_port(f'tcp://{host}')
@@ -704,41 +790,56 @@ def _init_socket(ctx: 'zmq.Context', host: str, port: int,
 def _check_msg_version(msg: 'jina_pb2.Message'):
     from ..logging import default_logger
     from .. import __version__, __proto_version__
+
     if hasattr(msg.envelope, 'version'):
         if not msg.envelope.version.jina:
             # only happen in unittest
-            default_logger.warning('incoming message contains empty "version.jina", '
-                                   'you may ignore it in debug/unittest mode. '
-                                   'otherwise please check if gateway service set correct version')
+            default_logger.warning(
+                'incoming message contains empty "version.jina", '
+                'you may ignore it in debug/unittest mode. '
+                'otherwise please check if gateway service set correct version'
+            )
         elif __version__ != msg.envelope.version.jina:
-            raise MismatchedVersion('mismatched JINA version! '
-                                    'incoming message has JINA version %s, whereas local JINA version %s' % (
-                                        msg.envelope.version.jina, __version__))
+            raise MismatchedVersion(
+                'mismatched JINA version! '
+                'incoming message has JINA version %s, whereas local JINA version %s'
+                % (msg.envelope.version.jina, __version__)
+            )
 
         if not msg.envelope.version.proto:
             # only happen in unittest
-            default_logger.warning('incoming message contains empty "version.proto", '
-                                   'you may ignore it in debug/unittest mode. '
-                                   'otherwise please check if gateway service set correct version')
+            default_logger.warning(
+                'incoming message contains empty "version.proto", '
+                'you may ignore it in debug/unittest mode. '
+                'otherwise please check if gateway service set correct version'
+            )
         elif __proto_version__ != msg.envelope.version.proto:
-            raise MismatchedVersion('mismatched protobuf version! '
-                                    'incoming message has protobuf version %s, whereas local protobuf version %s' % (
-                                        msg.envelope.version.proto, __proto_version__))
+            raise MismatchedVersion(
+                'mismatched protobuf version! '
+                'incoming message has protobuf version %s, whereas local protobuf version %s'
+                % (msg.envelope.version.proto, __proto_version__)
+            )
 
         if not msg.envelope.version.vcs or not os.environ.get('JINA_VCS_VERSION'):
-            default_logger.warning('incoming message contains empty "version.vcs", '
-                                   'you may ignore it in debug/unittest mode, '
-                                   'or if you run jina OUTSIDE docker container where JINA_VCS_VERSION is unset'
-                                   'otherwise please check if gateway service set correct version')
+            default_logger.warning(
+                'incoming message contains empty "version.vcs", '
+                'you may ignore it in debug/unittest mode, '
+                'or if you run jina OUTSIDE docker container where JINA_VCS_VERSION is unset'
+                'otherwise please check if gateway service set correct version'
+            )
         elif os.environ.get('JINA_VCS_VERSION') != msg.envelope.version.vcs:
-            raise MismatchedVersion('mismatched vcs version! '
-                                    'incoming message has vcs_version %s, whereas local environment vcs_version is %s' % (
-                                        msg.envelope.version.vcs, os.environ.get('JINA_VCS_VERSION')))
+            raise MismatchedVersion(
+                'mismatched vcs version! '
+                'incoming message has vcs_version %s, whereas local environment vcs_version is %s'
+                % (msg.envelope.version.vcs, os.environ.get('JINA_VCS_VERSION'))
+            )
 
     else:
-        raise MismatchedVersion('version_check=True locally, '
-                                'but incoming message contains no version info in its envelope. '
-                                'the message is probably sent from a very outdated JINA version')
+        raise MismatchedVersion(
+            'version_check=True locally, '
+            'but incoming message contains no version info in its envelope. '
+            'the message is probably sent from a very outdated JINA version'
+        )
 
 
 def _extract_bytes_from_documents(docs: Iterable['jina_pb2.Document']) -> Tuple:
@@ -775,7 +876,9 @@ def _extract_bytes_from_documents(docs: Iterable['jina_pb2.Document']) -> Tuple:
     return doc_bytes, chunk_bytes, chunk_byte_type
 
 
-def _fill_buffer_to_documents(msg_data: List[bytes], docs: Iterable['jina_pb2.Document'], offset: int = 3):
+def _fill_buffer_to_documents(
+    msg_data: List[bytes], docs: Iterable['jina_pb2.Document'], offset: int = 3
+):
     """
     Message comes split in different parts (that's why it comes as an Iterable, Each element
             can be any sendable object (Frame, bytes, buffer-providers)):
@@ -789,12 +892,14 @@ def _fill_buffer_to_documents(msg_data: List[bytes], docs: Iterable['jina_pb2.Do
     chunk_byte_type = msg_data[offset].decode()
     doc_bytes_len = int(msg_data[offset + 1])
     chunk_bytes_len = int(msg_data[offset + 2])
-    doc_bytes = msg_data[(offset + 3):(offset + 3 + doc_bytes_len)]
-    chunk_bytes = msg_data[(offset + 3 + doc_bytes_len):]
+    doc_bytes = msg_data[(offset + 3) : (offset + 3 + doc_bytes_len)]
+    chunk_bytes = msg_data[(offset + 3 + doc_bytes_len) :]
 
     if len(chunk_bytes) != chunk_bytes_len:
-        raise ValueError('"chunk_bytes_len"=%d in message, but the actual length is %d' % (
-            chunk_bytes_len, len(chunk_bytes)))
+        raise ValueError(
+            '"chunk_bytes_len"=%d in message, but the actual length is %d'
+            % (chunk_bytes_len, len(chunk_bytes))
+        )
 
     c_idx = 0
     d_idx = 0
@@ -853,6 +958,7 @@ def add_envelope(req, pod_name, identity, num_part=1) -> 'jina_pb2.Message':
 
 def _add_version(evlp: 'jina_pb2.Envelope'):
     from .. import __version__, __proto_version__
+
     evlp.version.jina = __version__
     evlp.version.proto = __proto_version__
     evlp.version.vcs = os.environ.get('JINA_VCS_VERSION', '')

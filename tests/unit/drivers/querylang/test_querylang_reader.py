@@ -24,11 +24,11 @@ def random_docs(num_docs):
                 dmm.score.ref_id = dm.id
         yield d
 
+
 PyClient.check_input(random_docs(10))
 
 
 class DummyDriver(QuerySetReader, BaseDriver):
-
     def __init__(self, arg1='hello', arg2=456, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._arg1 = arg1

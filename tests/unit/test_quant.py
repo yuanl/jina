@@ -38,7 +38,10 @@ def test_quant_f1(quant):
 
     f = Flow(callback_on_body=True).add(uses='_pass')
     with f as fl:
-        fl.index(random_docs(num_docs, chunks_per_doc=chunks_per_doc, embed_dim=embed_dim), output_fn=get_output)
+        fl.index(
+            random_docs(num_docs, chunks_per_doc=chunks_per_doc, embed_dim=embed_dim),
+            output_fn=get_output,
+        )
 
 
 @pytest.mark.parametrize('quant', ['fp32', 'fp16', 'uint8'])
@@ -48,4 +51,7 @@ def test_quant_f2(quant):
 
     f = Flow(callback_on_body=True, compress_hwm=1024).add(uses='_pass')
     with f as fl:
-        fl.index(random_docs(num_docs, chunks_per_doc=chunks_per_doc, embed_dim=embed_dim), output_fn=get_output)
+        fl.index(
+            random_docs(num_docs, chunks_per_doc=chunks_per_doc, embed_dim=embed_dim),
+            output_fn=get_output,
+        )

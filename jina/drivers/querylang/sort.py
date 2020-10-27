@@ -12,27 +12,34 @@ if False:
 
 class SortQL(QuerySetReader, BaseRecursiveDriver):
     """Sorts the incoming of the documents by the value of a given field.
-     It can also work in reverse mode
+    It can also work in reverse mode
 
-        Example::
-        - !ReduceAllDriver
-            with:
-                traversal_paths: ['m']
-        - !SortQL
-            with:
-                reverse: true
-                field: 'score__value'
-                traversal_paths: ['m']
-        - !SliceQL
-            with:
-                start: 0
-                end: 50
-                traversal_paths: ['m']
+       Example::
+       - !ReduceAllDriver
+           with:
+               traversal_paths: ['m']
+       - !SortQL
+           with:
+               reverse: true
+               field: 'score__value'
+               traversal_paths: ['m']
+       - !SliceQL
+           with:
+               start: 0
+               end: 50
+               traversal_paths: ['m']
 
-        `SortQL` will ensure that only the documents are sorted by the score value before slicing the first top 50 documents
+       `SortQL` will ensure that only the documents are sorted by the score value before slicing the first top 50 documents
     """
 
-    def __init__(self, field: str, reverse: bool = False, traversal_paths: Tuple[str] = ('c',), *args, **kwargs):
+    def __init__(
+        self,
+        field: str,
+        reverse: bool = False,
+        traversal_paths: Tuple[str] = ('c',),
+        *args,
+        **kwargs
+    ):
         """
         :param field: the value of the field drives the sort of the iterable docs
         :param reverse: sort the value from big to small

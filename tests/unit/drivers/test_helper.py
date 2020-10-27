@@ -3,26 +3,38 @@ import random
 import numpy as np
 import pytest
 
-from jina.drivers.helper import array2pb, pb2array, pb_obj2dict, add_route, extract_docs, DocGroundtruthPair
+from jina.drivers.helper import (
+    array2pb,
+    pb2array,
+    pb_obj2dict,
+    add_route,
+    extract_docs,
+    DocGroundtruthPair,
+)
 from jina.proto import jina_pb2
 
 
-@pytest.mark.parametrize(
-    'type', ['float32', 'float64', 'uint8']
-)
+@pytest.mark.parametrize('type', ['float32', 'float64', 'uint8'])
 @pytest.mark.repeat(10)
 def test_array_protobuf_conversions(type):
-    random_array = np.random.rand(random.randrange(0, 50), random.randrange(0, 20)).astype(type)
+    random_array = np.random.rand(
+        random.randrange(0, 50), random.randrange(0, 20)
+    ).astype(type)
     np.testing.assert_almost_equal(pb2array(array2pb(random_array, None)), random_array)
 
 
 @pytest.mark.parametrize(
-    'quantize, type', [('fp16', 'float32'), ('fp16', 'float64'), ('uint8', 'uint8')],
+    'quantize, type',
+    [('fp16', 'float32'), ('fp16', 'float64'), ('uint8', 'uint8')],
 )
 @pytest.mark.repeat(10)
 def test_array_protobuf_conversions_with_quantize(quantize, type):
-    random_array = np.random.rand(random.randrange(0, 50), random.randrange(0, 20)).astype(type)
-    np.testing.assert_almost_equal(pb2array(array2pb(random_array, quantize)), random_array, decimal=2)
+    random_array = np.random.rand(
+        random.randrange(0, 50), random.randrange(0, 20)
+    ).astype(type)
+    np.testing.assert_almost_equal(
+        pb2array(array2pb(random_array, quantize)), random_array, decimal=2
+    )
 
 
 def test_pb_obj2dict():

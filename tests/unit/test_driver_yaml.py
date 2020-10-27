@@ -34,7 +34,9 @@ def test_load_yaml1(tmpdir):
 def test_load_cust_with_driver():
     a = BaseExecutor.load_config('mwu-encoder/mwu_encoder_driver.yml')
     assert a._drivers['ControlRequest'][0].__class__.__name__ == 'MyAwesomeDriver'
-    p = set_pod_parser().parse_args(['--uses', os.path.join(cur_dir, 'mwu-encoder/mwu_encoder_driver.yml')])
+    p = set_pod_parser().parse_args(
+        ['--uses', os.path.join(cur_dir, 'mwu-encoder/mwu_encoder_driver.yml')]
+    )
     with Pod(p):
         # will print a cust task_name from the driver when terminate
         pass
@@ -51,7 +53,9 @@ def test_pod_new_api_from_kwargs():
 
 def test_load_yaml2(tmpdir):
     os.environ['JINA_TEST_EXEC_WITH_DRIVER'] = str(tmpdir)
-    a = BaseExecutor.load_config(os.path.join(cur_dir, 'yaml/test-exec-with-driver.yml'))
+    a = BaseExecutor.load_config(
+        os.path.join(cur_dir, 'yaml/test-exec-with-driver.yml')
+    )
     assert len(a._drivers) == 2
     # should be able to auto fill in ControlRequest
     assert 'ControlRequest' in a._drivers
@@ -72,11 +76,13 @@ def test_load_yaml2(tmpdir):
         ('executors._route.yml', 'route', 4),
         ('executors._pass.yml', 'forward', 4),
         ('executors._merge.yml', 'merge', 4),
-        ('executors._clear.yml', 'clear', 4)
-    ]
+        ('executors._clear.yml', 'clear', 4),
+    ],
 )
 def test_resource_executor(yaml_path, name, expected):
-    a = BaseExecutor.load_config(resource_filename('jina', '/'.join(('resources', yaml_path))))
+    a = BaseExecutor.load_config(
+        resource_filename('jina', '/'.join(('resources', yaml_path)))
+    )
     assert a.name == name
     assert len(a._drivers) == expected
 

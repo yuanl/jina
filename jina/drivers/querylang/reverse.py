@@ -12,13 +12,13 @@ if False:
 class ReverseQL(QuerySetReader, BaseRecursiveDriver):
     """Reverses the order of the provided ``docs``.
 
-        This is often useful when the proceeding Pods require only a signal, not the full message.
+    This is often useful when the proceeding Pods require only a signal, not the full message.
 
-        Example ::
-        - !Chunk2DocRankerDriver {}
-        - !ReverseQL {}
+    Example ::
+    - !Chunk2DocRankerDriver {}
+    - !ReverseQL {}
 
-        will reverse the order of the documents returned by the `Chunk2DocRankerDriver` before sending them to the next `Pod`
+    will reverse the order of the documents returned by the `Chunk2DocRankerDriver` before sending them to the next `Pod`
     """
 
     def __init__(self, traversal_paths: Tuple[str] = ('c',), *args, **kwargs):

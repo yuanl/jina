@@ -90,5 +90,6 @@ def test_check_update():
     assert _is_latest_version()
     # now mock it as old version
     import jina
+
     jina.__version__ = '0.1.0'
     assert not _is_latest_version()

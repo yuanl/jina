@@ -1,22 +1,19 @@
 import numpy as np
-from jina.executors.encoders.helper import reduce_max, reduce_mean, reduce_cls, reduce_min
+from jina.executors.encoders.helper import (
+    reduce_max,
+    reduce_mean,
+    reduce_cls,
+    reduce_min,
+)
 
-test_data = np.array([[
-    [10, 30, 10],
-    [20, 20, 20],
-    [30, 10, 30],
-    [100, 100, 100]
-], [
-    [10, 30, 10],
-    [20, 20, 20],
-    [30, 10, 30],
-    [100, 100, 100]
-]]).astype('float32')
+test_data = np.array(
+    [
+        [[10, 30, 10], [20, 20, 20], [30, 10, 30], [100, 100, 100]],
+        [[10, 30, 10], [20, 20, 20], [30, 10, 30], [100, 100, 100]],
+    ]
+).astype('float32')
 
-test_mask = np.array([
-    [1, 1, 1, 0],
-    [1, 1, 1, 1]
-]).astype('float32')
+test_mask = np.array([[1, 1, 1, 0], [1, 1, 1, 1]]).astype('float32')
 
 
 def test_reduce_max():

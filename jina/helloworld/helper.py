@@ -28,8 +28,9 @@ def print_result(resp):
 
 
 def write_html(html_path):
-    with open(resource_filename('jina', '/'.join(('resources', 'helloworld.html'))), 'r') as fp, \
-            open(html_path, 'w') as fw:
+    with open(
+        resource_filename('jina', '/'.join(('resources', 'helloworld.html'))), 'r'
+    ) as fp, open(html_path, 'w') as fw:
         t = fp.read()
         t = t.replace('{% RESULT %}', '\n'.join(result_html))
         fw.write(t)
@@ -41,24 +42,31 @@ def write_html(html_path):
     except:
         pass
     finally:
-        default_logger.success(f'You should see a "hello-world.html" opened in your browser, '
-                               f'if not you may open {url_html_path} manually')
+        default_logger.success(
+            f'You should see a "hello-world.html" opened in your browser, '
+            f'if not you may open {url_html_path} manually'
+        )
 
     colored_url = colored('https://opensource.jina.ai', color='cyan', attrs='underline')
     default_logger.success(
-        f'🤩 Intrigued? Play with "jina hello-world --help" and learn more about Jina at {colored_url}')
+        f'🤩 Intrigued? Play with "jina hello-world --help" and learn more about Jina at {colored_url}'
+    )
 
 
 def download_data(targets, download_proxy=None):
     opener = urllib.request.build_opener()
     if download_proxy:
-        proxy = urllib.request.ProxyHandler({'http': download_proxy, 'https': download_proxy})
+        proxy = urllib.request.ProxyHandler(
+            {'http': download_proxy, 'https': download_proxy}
+        )
         opener.add_handler(proxy)
     urllib.request.install_opener(opener)
     with ProgressBar(task_name='download fashion-mnist', batch_unit='') as t:
         for v in targets.values():
             if not os.path.exists(v['filename']):
-                urllib.request.urlretrieve(v['url'], v['filename'], reporthook=lambda *x: t.update(1))
+                urllib.request.urlretrieve(
+                    v['url'], v['filename'], reporthook=lambda *x: t.update(1)
+                )
             v['data'] = load_mnist(v['filename'])
 
 

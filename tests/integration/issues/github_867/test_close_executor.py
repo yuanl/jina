@@ -57,6 +57,7 @@ class OldErrorPea(BasePea):
     """
     This Pea tries to simulate the behavior of Pea before issue was fixed
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.daemon = True
@@ -78,7 +79,9 @@ class OldErrorPea(BasePea):
 
 @patch(target='jina.peapods.pea.BasePea', new=OldErrorPea)
 def test_close_and_load_executor_daemon_failed():
-    with Flow().add(uses=os.path.join(cur_dir, 'yaml/slowexecutor.yml'), daemon=True).build() as f:
+    with Flow().add(
+        uses=os.path.join(cur_dir, 'yaml/slowexecutor.yml'), daemon=True
+    ).build() as f:
         pass
 
     with pytest.raises(BadPersistantFile):

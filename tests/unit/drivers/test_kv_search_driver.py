@@ -8,7 +8,6 @@ from jina.proto import jina_pb2
 
 
 class MockIndexer(BaseKVIndexer):
-
     def add(self, keys: 'np.ndarray', vectors: 'np.ndarray', *args, **kwargs):
         pass
 
@@ -45,12 +44,11 @@ class MockIndexer(BaseKVIndexer):
             1: doc1.SerializeToString(),
             2: doc2.SerializeToString(),
             3: doc3.SerializeToString(),
-            4: doc4.SerializeToString()
+            4: doc4.SerializeToString(),
         }
 
 
 class SimpleKVSearchDriver(KVSearchDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -158,4 +156,3 @@ def test_vectorsearch_driver_mock_indexer_with_matches_on_chunks():
         assert match.embedding.buffer != b''
         embedding_array = pb2array(match.embedding)
         np.testing.assert_equal(embedding_array, np.array([int(match.id)]))
-

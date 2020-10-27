@@ -16,14 +16,20 @@ from ...logging import default_logger
 from ...proto import jina_pb2, uid
 
 
-def _fill_document(document: 'jina_pb2.Document',
-                   content: Union['jina_pb2.Document', 'np.ndarray', bytes, str, Tuple[
-                       Union['jina_pb2.Document', bytes], Union['jina_pb2.Document', bytes]]],
-                   docs_in_same_batch: int,
-                   mime_type: str,
-                   buffer_sniff: bool,
-                   override_doc_id: bool = True
-                   ):
+def _fill_document(
+    document: 'jina_pb2.Document',
+    content: Union[
+        'jina_pb2.Document',
+        'np.ndarray',
+        bytes,
+        str,
+        Tuple[Union['jina_pb2.Document', bytes], Union['jina_pb2.Document', bytes]],
+    ],
+    docs_in_same_batch: int,
+    mime_type: str,
+    buffer_sniff: bool,
+    override_doc_id: bool = True,
+):
     if isinstance(content, jina_pb2.Document):
         document.CopyFrom(content)
     elif isinstance(content, np.ndarray):
@@ -42,10 +48,10 @@ def _fill_document(document: 'jina_pb2.Document',
     elif isinstance(content, str):
         scheme = urllib.parse.urlparse(content).scheme
         if (
-                (scheme in {'http', 'https'} and is_url(content))
-                or (scheme in {'data'})
-                or os.path.exists(content)
-                or os.access(os.path.dirname(content), os.W_OK)
+            (scheme in {'http', 'https'} and is_url(content))
+            or (scheme in {'data'})
+            or os.path.exists(content)
+            or os.access(os.path.dirname(content), os.W_OK)
         ):
             document.uri = content
             mime_type = guess_mime(content)
@@ -67,16 +73,24 @@ def _fill_document(document: 'jina_pb2.Document',
         document.id = uid.new_doc_id(document)
 
 
-def _generate(data: Union[Iterator[Union['jina_pb2.Document', bytes]], Iterator[
-    Tuple[Union['jina_pb2.Document', bytes], Union['jina_pb2.Document', bytes]]], Iterator['np.ndarray'], Iterator[
-                              str], 'np.ndarray',],
-              batch_size: int = 0, mode: ClientMode = ClientMode.INDEX,
-              mime_type: str = None,
-              override_doc_id: bool = True,
-              queryset: Iterator['jina_pb2.QueryLang'] = None,
-              *args,
-              **kwargs,
-              ) -> Iterator['jina_pb2.Message']:
+def _generate(
+    data: Union[
+        Iterator[Union['jina_pb2.Document', bytes]],
+        Iterator[
+            Tuple[Union['jina_pb2.Document', bytes], Union['jina_pb2.Document', bytes]]
+        ],
+        Iterator['np.ndarray'],
+        Iterator[str],
+        'np.ndarray',
+    ],
+    batch_size: int = 0,
+    mode: ClientMode = ClientMode.INDEX,
+    mime_type: str = None,
+    override_doc_id: bool = True,
+    queryset: Iterator['jina_pb2.QueryLang'] = None,
+    *args,
+    **kwargs,
+) -> Iterator['jina_pb2.Message']:
     buffer_sniff = False
 
     try:
@@ -96,13 +110,14 @@ def _generate(data: Union[Iterator[Union['jina_pb2.Document', bytes]], Iterator[
     if isinstance(mode, str):
         mode = ClientMode.from_string(mode)
 
-    _fill = lambda x, y: _fill_document(document=x,
-                                        content=y,
-                                        docs_in_same_batch=batch_size,
-                                        mime_type=mime_type,
-                                        buffer_sniff=buffer_sniff,
-                                        override_doc_id=override_doc_id
-                                        )
+    _fill = lambda x, y: _fill_document(
+        document=x,
+        content=y,
+        docs_in_same_batch=batch_size,
+        mime_type=mime_type,
+        buffer_sniff=buffer_sniff,
+        override_doc_id=override_doc_id,
+    )
 
     for batch in batch_iterator(data, batch_size):
         req = jina_pb2.Request()
@@ -116,8 +131,10 @@ def _generate(data: Union[Iterator[Union['jina_pb2.Document', bytes]], Iterator[
         for content in batch:
             d = _req.docs.add()
             if isinstance(content, tuple) and len(content) == 2:
-                default_logger.debug('content comes in pair, '
-                                     'will take the first as the input and the scond as the groundtruth')
+                default_logger.debug(
+                    'content comes in pair, '
+                    'will take the first as the input and the scond as the groundtruth'
+                )
                 gt = _req.groundtruths.add()
                 _fill(d, content[0])
                 _fill(gt, content[1])

@@ -14,19 +14,42 @@ from datetime import datetime
 from io import StringIO
 from itertools import islice
 from types import SimpleNamespace, ModuleType
-from typing import Tuple, Optional, Iterator, Any, Union, List, Dict, Set, TextIO, Sequence, Iterable
+from typing import (
+    Tuple,
+    Optional,
+    Iterator,
+    Any,
+    Union,
+    List,
+    Dict,
+    Set,
+    TextIO,
+    Sequence,
+    Iterable,
+)
 
 from ruamel.yaml import YAML, nodes
 
 if False:
     from uvloop import Loop
 
-__all__ = ['batch_iterator', 'yaml',
-           'load_contrib_module',
-           'parse_arg',
-           'PathImporter', 'random_port', 'get_random_identity', 'expand_env_var',
-           'colored', 'kwargs2list', 'get_local_config_source', 'is_valid_local_config_source',
-           'cached_property', 'is_url', 'complete_path']
+__all__ = [
+    'batch_iterator',
+    'yaml',
+    'load_contrib_module',
+    'parse_arg',
+    'PathImporter',
+    'random_port',
+    'get_random_identity',
+    'expand_env_var',
+    'colored',
+    'kwargs2list',
+    'get_local_config_source',
+    'is_valid_local_config_source',
+    'cached_property',
+    'is_url',
+    'complete_path',
+]
 
 
 def deprecated_alias(**aliases):
@@ -43,13 +66,15 @@ def deprecated_alias(**aliases):
 
 def rename_kwargs(func_name: str, kwargs, aliases):
     from .logging import default_logger
+
     for alias, new in aliases.items():
         if alias in kwargs:
             if new in kwargs:
                 raise TypeError(f'{func_name} received both {alias} and {new}')
             default_logger.warning(
                 f'"{alias}" is deprecated in "{func_name}()" '
-                f'and will be removed in the next version; please use "{new}" instead')
+                f'and will be removed in the next version; please use "{new}" instead'
+            )
             kwargs[new] = kwargs.pop(alias)
 
 
@@ -74,14 +99,23 @@ def print_load_table(load_stat: Dict[str, List[Any]]):
     for k, v in load_stat.items():
         for cls_name, import_stat, err_reason in v:
             if cls_name not in cached:
-                load_table.append('%-5s %-25s %-40s %s' % (
-                    colored('✓', 'green') if import_stat else colored('✗', 'red'),
-                    cls_name if cls_name else colored('Module load error', 'red'), k, str(err_reason)))
+                load_table.append(
+                    '%-5s %-25s %-40s %s'
+                    % (
+                        colored('✓', 'green') if import_stat else colored('✗', 'red'),
+                        cls_name if cls_name else colored('Module load error', 'red'),
+                        k,
+                        str(err_reason),
+                    )
+                )
                 cached.add(cls_name)
     if load_table:
         load_table.sort()
-        load_table = ['', '%-5s %-25s %-40s %-s' % ('Load', 'Class', 'Module', 'Dependency'),
-                      '%-5s %-25s %-40s %-s' % ('-' * 5, '-' * 25, '-' * 40, '-' * 10)] + load_table
+        load_table = [
+            '',
+            '%-5s %-25s %-40s %-s' % ('Load', 'Class', 'Module', 'Dependency'),
+            '%-5s %-25s %-40s %-s' % ('-' * 5, '-' * 25, '-' * 40, '-' * 10),
+        ] + load_table
         default_logger.info('\n'.join(load_table))
 
 
@@ -91,9 +125,15 @@ def print_load_csv_table(load_stat: Dict[str, List[Any]]):
     load_table = []
     for k, v in load_stat.items():
         for cls_name, import_stat, err_reason in v:
-            load_table.append('%s %s %s %s' % (
-                colored('✓', 'green') if import_stat else colored('✗', 'red'),
-                cls_name if cls_name else colored('Module_load_error', 'red'), k, str(err_reason)))
+            load_table.append(
+                '%s %s %s %s'
+                % (
+                    colored('✓', 'green') if import_stat else colored('✗', 'red'),
+                    cls_name if cls_name else colored('Module_load_error', 'red'),
+                    k,
+                    str(err_reason),
+                )
+            )
     if load_table:
         default_logger.info('\n'.join(load_table))
 
@@ -106,14 +146,20 @@ def print_dep_tree_rst(fp, dep_tree, title='Executor'):
         for k, v in d.items():
             if k != 'module':
                 treeview.append('   ' * depth + f'- `{k}`')
-                tableview.add(f'| `{k}` | ' + (f'`{d["module"]}`' if 'module' in d else ' ') + ' |')
+                tableview.add(
+                    f'| `{k}` | '
+                    + (f'`{d["module"]}`' if 'module' in d else ' ')
+                    + ' |'
+                )
                 _iter(v, depth + 1)
 
     _iter(dep_tree, 0)
 
-    fp.write(f'# List of {len(tableview)} {title}s in Jina\n\n'
-             f'This version of Jina includes {len(tableview)} {title}s.\n\n'
-             f'## Inheritances in a Tree View\n')
+    fp.write(
+        f'# List of {len(tableview)} {title}s in Jina\n\n'
+        f'This version of Jina includes {len(tableview)} {title}s.\n\n'
+        f'## Inheritances in a Tree View\n'
+    )
     fp.write('\n'.join(treeview))
 
     fp.write(f'\n\n## Modules in a Table View \n\n| Class | Module |\n')
@@ -131,9 +177,11 @@ def touch_dir(base_dir: str) -> None:
         os.makedirs(base_dir)
 
 
-def batch_iterator(data: Iterable[Any], batch_size: int, axis: int = 0,
-                   yield_slice: bool = False) -> Iterator[Any]:
+def batch_iterator(
+    data: Iterable[Any], batch_size: int, axis: int = 0, yield_slice: bool = False
+) -> Iterator[Any]:
     import numpy as np
+
     if not batch_size or batch_size <= 0:
         yield data
         return
@@ -159,7 +207,7 @@ def batch_iterator(data: Iterable[Any], batch_size: int, axis: int = 0,
             yield data
             return
         for _ in range(0, len(data), batch_size):
-            yield data[_:_ + batch_size]
+            yield data[_ : _ + batch_size]
     elif isinstance(data, Iterable):
         data = iter(data)
         # as iterator, there is no way to know the length of it
@@ -225,12 +273,16 @@ def load_contrib_module() -> Optional[List[Any]]:
 
         if contrib:
             from .logging import default_logger
+
             default_logger.info(
-                f'find a value in $JINA_CONTRIB_MODULE={contrib}, will load them as external modules')
+                f'find a value in $JINA_CONTRIB_MODULE={contrib}, will load them as external modules'
+            )
             for p in contrib.split(','):
                 m = PathImporter.add_modules(p)
                 modules.append(m)
-                default_logger.info(f'successfully registered {m} class, you can now use it via yaml.')
+                default_logger.info(
+                    f'successfully registered {m} class, you can now use it via yaml.'
+                )
     else:
         modules = None
 
@@ -238,9 +290,10 @@ def load_contrib_module() -> Optional[List[Any]]:
 
 
 class PathImporter:
-
     @staticmethod
-    def _get_module_name(path: str, use_abspath: bool = False, use_basename: bool = True) -> str:
+    def _get_module_name(
+        path: str, use_abspath: bool = False, use_basename: bool = True
+    ) -> str:
         module_name = os.path.dirname(os.path.abspath(path) if use_abspath else path)
         if use_basename:
             module_name = os.path.basename(module_name)
@@ -251,13 +304,16 @@ class PathImporter:
     def add_modules(*paths) -> Optional[ModuleType]:
         for p in paths:
             if not os.path.exists(p):
-                raise FileNotFoundError('cannot import module from %s, file not exist', p)
+                raise FileNotFoundError(
+                    'cannot import module from %s, file not exist', p
+                )
             module = PathImporter._path_import(p)
         return module
 
     @staticmethod
     def _path_import(absolute_path: str) -> Optional[ModuleType]:
         import importlib.util
+
         try:
             # module_name = (PathImporter._get_module_name(absolute_path) or
             #                PathImporter._get_module_name(absolute_path, use_abspath=True) or 'jinahub')
@@ -272,16 +328,112 @@ class PathImporter:
         return module
 
 
-_random_names = (('first', 'great', 'local', 'small', 'right', 'large', 'young', 'early', 'major', 'clear', 'black',
-                  'whole', 'third', 'white', 'short', 'human', 'royal', 'wrong', 'legal', 'final', 'close', 'total',
-                  'prime', 'happy', 'sorry', 'basic', 'aware', 'ready', 'green', 'heavy', 'extra', 'civil', 'chief',
-                  'usual', 'front', 'fresh', 'joint', 'alone', 'rural', 'light', 'equal', 'quiet', 'quick', 'daily',
-                  'urban', 'upper', 'moral', 'vital', 'empty', 'brief',),
-                 ('world', 'house', 'place', 'group', 'party', 'money', 'point', 'state', 'night', 'water', 'thing',
-                  'order', 'power', 'court', 'level', 'child', 'south', 'staff', 'woman', 'north', 'sense', 'death',
-                  'range', 'table', 'trade', 'study', 'other', 'price', 'class', 'union', 'value', 'paper', 'right',
-                  'voice', 'stage', 'light', 'march', 'board', 'month', 'music', 'field', 'award', 'issue', 'basis',
-                  'front', 'heart', 'force', 'model', 'space', 'peter',))
+_random_names = (
+    (
+        'first',
+        'great',
+        'local',
+        'small',
+        'right',
+        'large',
+        'young',
+        'early',
+        'major',
+        'clear',
+        'black',
+        'whole',
+        'third',
+        'white',
+        'short',
+        'human',
+        'royal',
+        'wrong',
+        'legal',
+        'final',
+        'close',
+        'total',
+        'prime',
+        'happy',
+        'sorry',
+        'basic',
+        'aware',
+        'ready',
+        'green',
+        'heavy',
+        'extra',
+        'civil',
+        'chief',
+        'usual',
+        'front',
+        'fresh',
+        'joint',
+        'alone',
+        'rural',
+        'light',
+        'equal',
+        'quiet',
+        'quick',
+        'daily',
+        'urban',
+        'upper',
+        'moral',
+        'vital',
+        'empty',
+        'brief',
+    ),
+    (
+        'world',
+        'house',
+        'place',
+        'group',
+        'party',
+        'money',
+        'point',
+        'state',
+        'night',
+        'water',
+        'thing',
+        'order',
+        'power',
+        'court',
+        'level',
+        'child',
+        'south',
+        'staff',
+        'woman',
+        'north',
+        'sense',
+        'death',
+        'range',
+        'table',
+        'trade',
+        'study',
+        'other',
+        'price',
+        'class',
+        'union',
+        'value',
+        'paper',
+        'right',
+        'voice',
+        'stage',
+        'light',
+        'march',
+        'board',
+        'month',
+        'music',
+        'field',
+        'award',
+        'issue',
+        'basis',
+        'front',
+        'heart',
+        'force',
+        'model',
+        'space',
+        'peter',
+    ),
+)
 
 
 def random_name() -> str:
@@ -326,7 +478,9 @@ def expand_env_var(v: str) -> Optional[Union[bool, int, str, list, float]]:
         return v
 
 
-def expand_dict(d: Dict, expand_fn=expand_env_var, resolve_cycle_ref=True) -> Dict[str, Any]:
+def expand_dict(
+    d: Dict, expand_fn=expand_env_var, resolve_cycle_ref=True
+) -> Dict[str, Any]:
     expand_map = SimpleNamespace()
     pat = re.compile(r'{.+}|\$[a-zA-Z0-9_]*\b')
 
@@ -381,22 +535,25 @@ def expand_dict(d: Dict, expand_fn=expand_env_var, resolve_cycle_ref=True) -> Di
     return d
 
 
-_ATTRIBUTES = {'bold': 1,
-               'dark': 2,
-               'underline': 4,
-               'blink': 5,
-               'reverse': 7,
-               'concealed': 8}
+_ATTRIBUTES = {
+    'bold': 1,
+    'dark': 2,
+    'underline': 4,
+    'blink': 5,
+    'reverse': 7,
+    'concealed': 8,
+}
 
-_HIGHLIGHTS = {'on_grey': 40,
-               'on_red': 41,
-               'on_green': 42,
-               'on_yellow': 43,
-               'on_blue': 44,
-               'on_magenta': 45,
-               'on_cyan': 46,
-               'on_white': 47
-               }
+_HIGHLIGHTS = {
+    'on_grey': 40,
+    'on_red': 41,
+    'on_green': 42,
+    'on_yellow': 43,
+    'on_blue': 44,
+    'on_magenta': 45,
+    'on_cyan': 46,
+    'on_white': 47,
+}
 
 _COLORS = {
     'grey': 30,
@@ -406,7 +563,8 @@ _COLORS = {
     'blue': 34,
     'magenta': 35,
     'cyan': 36,
-    'white': 37}
+    'white': 37,
+}
 
 _RESET = '\033[0m'
 
@@ -415,20 +573,24 @@ def build_url_regex_pattern():
     ul = '\u00a1-\uffff'  # Unicode letters range (must not be a raw string).
 
     # IP patterns
-    ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    ipv4_re = (
+        r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    )
     ipv6_re = r'\[[0-9a-f:.]+\]'  # (simple regex, validated later)
 
     # Host patterns
-    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
+    hostname_re = (
+        r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
+    )
     # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
     domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]{1,63}(?<!-))*'
     tld_re = (
-            r'\.'  # dot
-            r'(?!-)'  # can't start with a dash
-            r'(?:[a-z' + ul + '-]{2,63}'  # domain label
-                              r'|xn--[a-z0-9]{1,59})'  # or punycode label
-                              r'(?<!-)'  # can't end with a dash
-                              r'\.?'  # may have a trailing dot
+        r'\.'  # dot
+        r'(?!-)'  # can't start with a dash
+        r'(?:[a-z' + ul + '-]{2,63}'  # domain label
+        r'|xn--[a-z0-9]{1,59})'  # or punycode label
+        r'(?<!-)'  # can't end with a dash
+        r'\.?'  # may have a trailing dot
     )
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
@@ -436,9 +598,11 @@ def build_url_regex_pattern():
         r'^(?:[a-z0-9.+-]*)://'  # scheme is validated separately
         r'(?:[^\s:@/]+(?::[^\s:@/]*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
-                                                           r'(?::\d{2,5})?'  # port
-                                                           r'(?:[/?#][^\s]*)?'  # resource path
-                                                           r'\Z', re.IGNORECASE)
+        r'(?::\d{2,5})?'  # port
+        r'(?:[/?#][^\s]*)?'  # resource path
+        r'\Z',
+        re.IGNORECASE,
+    )
 
 
 url_pat = build_url_regex_pattern()
@@ -452,8 +616,12 @@ if os.name == 'nt':
     os.system('color')
 
 
-def colored(text: str, color: Optional[str] = None,
-            on_color: Optional[str] = None, attrs: Union[str, list, None] = None) -> str:
+def colored(
+    text: str,
+    color: Optional[str] = None,
+    on_color: Optional[str] = None,
+    attrs: Union[str, list, None] = None,
+) -> str:
     if 'JINA_LOG_NO_COLOR' not in os.environ:
         fmt_str = '\033[%dm%s'
         if color:
@@ -506,10 +674,13 @@ def kwargs2list(kwargs: Dict) -> List[str]:
     return args
 
 
-def get_local_config_source(path: str, to_stream: bool = False) -> Union[StringIO, TextIO, str]:
+def get_local_config_source(
+    path: str, to_stream: bool = False
+) -> Union[StringIO, TextIO, str]:
     # priority, filepath > classname > default
     import io
     from pkg_resources import resource_filename
+
     if hasattr(path, 'read'):
         # already a readable stream
         return path
@@ -517,26 +688,44 @@ def get_local_config_source(path: str, to_stream: bool = False) -> Union[StringI
         _p = complete_path(path)
         return open(_p, encoding='utf8') if to_stream else _p
     elif path.startswith('_') and os.path.exists(
-            resource_filename('jina', '/'.join(('resources', 'executors.%s.yml' % path)))):
-        return resource_filename('jina', '/'.join(('resources', 'executors.%s.yml' % path)))
+        resource_filename('jina', '/'.join(('resources', 'executors.%s.yml' % path)))
+    ):
+        return resource_filename(
+            'jina', '/'.join(('resources', 'executors.%s.yml' % path))
+        )
     elif path.startswith('!'):
         # possible YAML content
         path = path.replace('|', '\n    with: ')
         return io.StringIO(path)
     elif path.startswith('- !'):
         # possible driver YAML content, right now it is only used for debugging
-        with open(resource_filename('jina', '/'.join(
-                ('resources', 'executors.base.all.yml' if path.startswith('- !!') else 'executors.base.yml')))) as fp:
+        with open(
+            resource_filename(
+                'jina',
+                '/'.join(
+                    (
+                        'resources',
+                        'executors.base.all.yml'
+                        if path.startswith('- !!')
+                        else 'executors.base.yml',
+                    )
+                ),
+            )
+        ) as fp:
             _defaults = fp.read()
-        path = path.replace('- !!', '- !').replace('|', '\n        with: ')  # for indent, I know, its nasty
+        path = path.replace('- !!', '- !').replace(
+            '|', '\n        with: '
+        )  # for indent, I know, its nasty
         path = _defaults.replace('*', path)
         return io.StringIO(path)
     elif path.isidentifier():
         # possible class name
         return io.StringIO(f'!{path}')
     else:
-        raise FileNotFoundError(f'{path} can not be resolved, it should be a readable stream,'
-                                ' or a valid file path, or a supported class name.')
+        raise FileNotFoundError(
+            f'{path} can not be resolved, it should be a readable stream,'
+            ' or a valid file path, or a supported class name.'
+        )
 
 
 def is_valid_local_config_source(path: str) -> bool:
@@ -547,26 +736,34 @@ def is_valid_local_config_source(path: str) -> bool:
         return False
 
 
-def get_parsed_args(kwargs: Dict[str, Union[str, int, bool]],
-                    parser: ArgumentParser, parser_name: str = None
-                    ) -> Tuple[List[str], Namespace, List[Any]]:
+def get_parsed_args(
+    kwargs: Dict[str, Union[str, int, bool]],
+    parser: ArgumentParser,
+    parser_name: str = None,
+) -> Tuple[List[str], Namespace, List[Any]]:
     args = kwargs2list(kwargs)
     try:
         p_args, unknown_args = parser.parse_known_args(args)
         if unknown_args:
             from .logging import default_logger
+
             default_logger.debug(
                 f'parser {parser_name} can not '
                 f'recognize the following args: {unknown_args}, '
                 f'they are ignored. if you are using them from a global args (e.g. Flow), '
-                f'then please ignore this message')
+                f'then please ignore this message'
+            )
     except SystemExit:
-        raise ValueError('bad arguments "%s" with parser %r, '
-                         'you may want to double check your args ' % (args, parser))
+        raise ValueError(
+            'bad arguments "%s" with parser %r, '
+            'you may want to double check your args ' % (args, parser)
+        )
     return args, p_args, unknown_args
 
 
-def get_non_defaults_args(args: Namespace, parser: ArgumentParser, taboo: Set[Optional[str]] = None) -> Dict:
+def get_non_defaults_args(
+    args: Namespace, parser: ArgumentParser, taboo: Set[Optional[str]] = None
+) -> Dict:
     if taboo is None:
         taboo = set()
     non_defaults = {}
@@ -585,25 +782,27 @@ def get_full_version() -> Optional[Tuple[Dict, Dict]]:
     from pkg_resources import resource_filename
     import platform
     from .logging import default_logger
+
     try:
 
-        info = {'jina': __version__,
-                'jina-proto': __proto_version__,
-                'jina-vcs-tag': os.environ.get('JINA_VCS_VERSION', '(unset)'),
-                'libzmq': zmq.zmq_version(),
-                'pyzmq': numpy.__version__,
-                'protobuf': google.protobuf.__version__,
-                'proto-backend': api_implementation._default_implementation_type,
-                'grpcio': getattr(grpc, '__version__', _grpcio_metadata.__version__),
-                'ruamel.yaml': ruamel.yaml.__version__,
-                'python': platform.python_version(),
-                'platform': platform.system(),
-                'platform-release': platform.release(),
-                'platform-version': platform.version(),
-                'architecture': platform.machine(),
-                'processor': platform.processor(),
-                'jina-resources': resource_filename('jina', 'resources')
-                }
+        info = {
+            'jina': __version__,
+            'jina-proto': __proto_version__,
+            'jina-vcs-tag': os.environ.get('JINA_VCS_VERSION', '(unset)'),
+            'libzmq': zmq.zmq_version(),
+            'pyzmq': numpy.__version__,
+            'protobuf': google.protobuf.__version__,
+            'proto-backend': api_implementation._default_implementation_type,
+            'grpcio': getattr(grpc, '__version__', _grpcio_metadata.__version__),
+            'ruamel.yaml': ruamel.yaml.__version__,
+            'python': platform.python_version(),
+            'platform': platform.system(),
+            'platform-release': platform.release(),
+            'platform-version': platform.version(),
+            'architecture': platform.machine(),
+            'processor': platform.processor(),
+            'jina-resources': resource_filename('jina', 'resources'),
+        }
         env_info = {k: os.getenv(k, '(unset)') for k in __jina_env__}
         full_version = info, env_info
     except Exception as e:
@@ -624,19 +823,24 @@ def use_uvloop():
         try:
             import asyncio
             import uvloop
+
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
         except (ModuleNotFoundError, ImportError):
             from .logging import default_logger
+
             default_logger.error(
                 'Since v0.3.6 jina uses uvloop to manage events and sockets, it often yields 20% speedup'
-                'you did not install uvloop. Try "pip install uvloop"')
+                'you did not install uvloop. Try "pip install uvloop"'
+            )
 
 
 def show_ioloop_backend(loop: Optional['Loop'] = None) -> None:
     if loop is None:
         import asyncio
+
         loop = asyncio.get_event_loop()
     from .logging import default_logger
+
     default_logger.info(f'using {loop.__class__} as event loop')
 
 
@@ -675,6 +879,7 @@ def get_now_timestamp():
 
 def complete_path(path: str) -> str:
     import inspect
+
     _p = None
 
     if os.path.exists(path):
@@ -703,6 +908,7 @@ def complete_path(path: str) -> str:
 
 def get_readable_time(*args, **kwargs):
     import datetime
+
     secs = float(datetime.timedelta(*args, **kwargs).total_seconds())
     units = [('day', 86400), ('hour', 3600), ('minute', 60), ('second', 1)]
     parts = []

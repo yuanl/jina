@@ -42,16 +42,26 @@ class PlainFormatter(Formatter):
 class JsonFormatter(Formatter):
     """Format the log message as a JSON object so that it can be later used/parsed in browser with javascript. """
 
-    KEYS = {'created', 'filename', 'funcName', 'levelname', 'lineno', 'msg',
-            'module', 'name', 'pathname', 'process', 'thread', 'processName',
-            'threadName'}  #: keys to extract from the log
+    KEYS = {
+        'created',
+        'filename',
+        'funcName',
+        'levelname',
+        'lineno',
+        'msg',
+        'module',
+        'name',
+        'pathname',
+        'process',
+        'thread',
+        'processName',
+        'threadName',
+    }  #: keys to extract from the log
 
     def format(self, record):
         cr = copy(record)
         cr.msg = re.sub(r'\u001b\[.*?[@-~]', '', str(cr.msg))
-        return json.dumps(
-            {k: getattr(cr, k) for k in self.KEYS},
-            sort_keys=True)
+        return json.dumps({k: getattr(cr, k) for k in self.KEYS}, sort_keys=True)
 
 
 class ProfileFormatter(Formatter):
@@ -60,7 +70,9 @@ class ProfileFormatter(Formatter):
     def format(self, record):
         cr = copy(record)
         if isinstance(cr.msg, dict):
-            cr.msg.update({k: getattr(cr, k) for k in ['created', 'module', 'process', 'thread']})
+            cr.msg.update(
+                {k: getattr(cr, k) for k in ['created', 'module', 'process', 'thread']}
+            )
             cr.msg['memory'] = used_memory(unit=1)
             return json.dumps(cr.msg, sort_keys=True)
         else:

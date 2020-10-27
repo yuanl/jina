@@ -8,7 +8,6 @@ from jina.proto import jina_pb2, uid
 
 
 class MockGroundTruthIndexer(BaseKVIndexer):
-
     def add(self, keys: 'np.ndarray', vectors: 'np.ndarray', *args, **kwargs):
         pass
 
@@ -41,7 +40,7 @@ class MockGroundTruthIndexer(BaseKVIndexer):
         self.db = {
             uid.id2hash(doc1.id): doc1.SerializeToString(),
             uid.id2hash(doc2.id): doc2.SerializeToString(),
-            uid.id2hash(doc4.id): doc4.SerializeToString()
+            uid.id2hash(doc4.id): doc4.SerializeToString(),
         }
 
 
@@ -84,7 +83,9 @@ def eval_request():
     return req
 
 
-def test_load_groundtruth_driver(mock_groundtruth_indexer, simple_load_groundtruth_driver, eval_request):
+def test_load_groundtruth_driver(
+    mock_groundtruth_indexer, simple_load_groundtruth_driver, eval_request
+):
     simple_load_groundtruth_driver.attach(executor=mock_groundtruth_indexer, pea=None)
     simple_load_groundtruth_driver.eval_request = eval_request
     simple_load_groundtruth_driver()
