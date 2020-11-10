@@ -5,7 +5,6 @@
 An easier way to build neural search in the cloud
 </p>
 <br>
-
 <p align="center">
 <a href="#license"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/license-badge.svg?raw=true" alt="Jina" title="Jina is licensed under Apache-2.0"></a>
 <a href="https://pypi.org/project/jina/"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/python-badge.svg?raw=true" alt="Python 3.7 3.8" title="Jina supports Python 3.7 and above"></a>
@@ -14,9 +13,10 @@ An easier way to build neural search in the cloud
 <a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACI"><img src="https://github.com/jina-ai/jina/workflows/CI/badge.svg" alt="CI"></a>
 <a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACD"><img src="https://github.com/jina-ai/jina/workflows/CD/badge.svg?branch=master" alt="CD"></a>
 <a href="https://codecov.io/gh/jina-ai/jina"><img src="https://codecov.io/gh/jina-ai/jina/branch/master/graph/badge.svg" alt="codecov"></a>
-</p>
-
-<p align="center"><sub>
+<br>
+<strong><a href="#get-started">Quick Start</a></strong> | <strong><a href="#jina-hello-world-">Hello World</a></strong> | <strong><a href="#documentation">Learn</a></strong> | <strong><a href="#contributing">Contribute</a></strong> | <strong><a href="#join-us">Join Us</a></strong>
+<br>
+<sub>
   <a href="https://github.com/jina-ai/jina">English</a> •
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.zh.md">中文</a> •
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.fr.md">Français</a> •
@@ -26,9 +26,9 @@ An easier way to build neural search in the cloud
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.pt_br.md">Português</a> •
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.ru.md">Русский язык</a> •
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.pt_br.md">український</a>
-</sub></p>
+</sub>
 
-
+## What is Jina?
 
 Jina is an AI-powered search framework, empowering developers to create **cross-/multi-modal search systems** (e.g. text, images, video, audio) on the cloud. Jina is long-term supported by a [full-time, venture-backed team](https://jina.ai).
 
@@ -42,37 +42,6 @@ Jina is an AI-powered search framework, empowering developers to create **cross-
 
 🧩 **Plug & Play** - Easily extendable with Pythonic interface.
 
----
-<p align="center">
-  <a href="https://jina.ai">Website</a> •
-  <a href="https://docs.jina.ai">Docs</a> •
-  <a href="https://learn.jina.ai">Examples</a> •
-  <a href="https://github.com/jina-ai/jina-hub">Hub</a> •
-  <a href="https://dashboard.jina.ai">Dashboard</a> •
-  <a href="https://github.com/jina-ai/jinabox.js/">Jinabox</a> •
-  <a href="http://www.twitter.com/JinaAI_">Twitter</a> •
-  <a href="https://jobs.jina.ai">We are Hiring</a>
-</p>
-
-
-## Contents
-
-<img align="right" width="350px" src="https://github.com/jina-ai/jina/blob/master/.github/install.png?raw=true " />
-
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-- [Get Started](#get-started)
-- [Jina "Hello, World!" 👋🌍](#jina-hello-world-)
-- [Tutorials](#tutorials)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [Community](#community)
-- [Open Governance](#open-governance)
-- [Join Us](#join-us)
-- [License](#license)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Get Started
 
@@ -238,8 +207,53 @@ jina hub new --type app
 You can easily create a Jina project from templates with one terminal command. This creates a Python entrypoint, YAML configs and a Dockerfile. You can start from there.
 
 
-## Tutorials
+## Learn
 
+### [What is Neural Search?](https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html)</li>
+<li>[Jina 101: First Thing to Learn About Jina](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)<br>
+  <sub>
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a></sub>
+  </li>
+</ul>
+
+<table>
+  <tr>
+    <td>
+      <a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">
+        <img src="https://miro.medium.com/max/1000/1*czKD1E9fL1ndRGzwjv9Kvg.png", title="What is Neural Search?" alt="What is Neural search?">
+      </a>
+    </td>
+    <td>
+      <h3>
+      <a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">
+        What is Neural Search?
+      </a>
+      </h3>
+      <p>AI-powered search with less effort, more flexibility</p>
+    </td>
+  </tr>
+  <tr>
+      <td width="30%">
+    <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">
+      <img src="https://github.com/jina-ai/jina/blob/master/docs/chapters/101/img/ILLUS12.png?raw=true" alt="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited" title="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited"/>
+    </a>
+    </td>
+    <td width="70%">
+&nbsp;&nbsp;<h3><a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">Jina 101: First Thing to Learn About Jina</a></h3>
+&nbsp;&nbsp;<a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">English</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a>
+    </td>
+
+  </tr>
+</table>
 <table>
   <tr>
       <td width="30%">
@@ -261,6 +275,9 @@ You can easily create a Jina project from templates with one terminal command. T
 
   </tr>
 </table>
+
+
+## Tutorials
 
 <table>
 <tr>
