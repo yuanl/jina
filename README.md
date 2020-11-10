@@ -215,21 +215,24 @@ You can easily create a Jina project from templates with one terminal command. T
 <img src="./what.png">
 </td>
 <td>
-<img src="./what.png">
+<img src="./101.png">
 </td>
 <td>
-<img src="./what.png">
+<img src="./first.png">
 </td>
 </tr>
 <tr>
 <td>
-<a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">What is Neural Search?</a></strong>: AI-powered search with less effort, more flexibility 
+<h4><a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">What is Neural Search?</a></h4>
+AI-powered search with less effort, more flexibility 
 </td>
 <td>
-<a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">What is Neural Search?</a></strong>: AI-powered search with less effort, more flexibility 
+<h4><a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">Jina 101</a></h4>
+First things to learn about Jina (<a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> • <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> • <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> • <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> • <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a>
 </td>
 <td>
-<a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">What is Neural Search?</a></strong>: AI-powered search with less effort, more flexibility 
+<h4><a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">My First Jina App</a></h4>
+Brand new to neural search? Not for long! Use cookiecutter to search through Star Trek scripts using Jina
 </td>
 </tr>
 </table>
