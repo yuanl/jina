@@ -209,16 +209,9 @@ You can easily create a Jina project from templates with one terminal command. T
 
 ## Learn
 
-### [What is Neural Search?](https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html)
-
-AI-powered search with less effort, more flexibility
-
-### [Jina 101](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)
-  First things to learn about Jina ([日本語](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md) • [français](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md) • [Deutsch](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md) • [Русский язык](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md) • [中文](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md) ### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app))
-  
-### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app)
-
-Brand new to neural search? Not for long! Use cookiecutter to search through Star Trek scripts using Jina
+- **[What is Neural Search?](https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html)**: AI-powered search with less effort, more flexibility
+- **[Jina 101](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)**: First things to learn about Jina ([日本語](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md) • [français](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md) • [Deutsch](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md) • [Русский язык](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md) • [中文](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md) ### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app))
+- **[My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app)**: Brand new to neural search? Not for long! Use cookiecutter to search through Star Trek scripts using Jina
 
 ### Tutorials
 
