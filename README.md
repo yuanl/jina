@@ -209,8 +209,13 @@ You can easily create a Jina project from templates with one terminal command. T
 
 ## Learn
 
-### [What is Neural Search?](https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html)</li>
-<li>[Jina 101: First Thing to Learn About Jina](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)<br>
+### [What is Neural Search?](https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html)
+
+AI-powered search with less effort, more flexibility
+
+### [Jina 101](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)
+  First things to learn about Jina 
+  
   <sub>
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
@@ -218,7 +223,10 @@ You can easily create a Jina project from templates with one terminal command. T
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a></sub>
   </li>
-</ul>
+  
+### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app)
+
+Brand new to neural search? Not for long! Use cookiecutter to search through Star Trek scripts using Jina
 
 <table>
   <tr>
