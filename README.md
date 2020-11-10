@@ -216,13 +216,12 @@ AI-powered search with less effort, more flexibility
 ### [Jina 101](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)
   First things to learn about Jina 
   
-  <sub>
+  <small>
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
   <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a></sub>
-  </li>
+  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a></small>
   
 ### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app)
 
