@@ -212,13 +212,13 @@ You can easily create a Jina project from templates with one terminal command. T
 <table>
 <tr>
 <td>
-<img src="what.png">
+<img src="./what.png">
 </td>
 <td>
-<img src="what.png">
+<img src="./what.png">
 </td>
 <td>
-<img src="what.png">
+<img src="./what.png">
 </td>
 </tr>
 <tr>
