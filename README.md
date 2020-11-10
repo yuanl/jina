@@ -214,151 +214,17 @@ You can easily create a Jina project from templates with one terminal command. T
 AI-powered search with less effort, more flexibility
 
 ### [Jina 101](https://github.com/jina-ai/jina/tree/master/docs/chapters/101)
-  First things to learn about Jina 
-  
-  <small>
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a></small>
+  First things to learn about Jina ([日本語](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md) • [français](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md) • [Deutsch](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md) • [Русский язык](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md) • [中文](https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md) ### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app))
   
 ### [My First Jina App](https://github.com/jina-ai/examples/tree/master/my-first-jina-app)
 
 Brand new to neural search? Not for long! Use cookiecutter to search through Star Trek scripts using Jina
 
-<table>
-  <tr>
-    <td>
-      <a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">
-        <img src="https://miro.medium.com/max/1000/1*czKD1E9fL1ndRGzwjv9Kvg.png", title="What is Neural Search?" alt="What is Neural search?">
-      </a>
-    </td>
-    <td>
-      <h3>
-      <a href="https://jina.ai/2020/07/06/What-is-Neural-Search-and-Why-Should-I-Care.html">
-        What is Neural Search?
-      </a>
-      </h3>
-      <p>AI-powered search with less effort, more flexibility</p>
-    </td>
-  </tr>
-  <tr>
-      <td width="30%">
-    <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">
-      <img src="https://github.com/jina-ai/jina/blob/master/docs/chapters/101/img/ILLUS12.png?raw=true" alt="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited" title="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited"/>
-    </a>
-    </td>
-    <td width="70%">
-&nbsp;&nbsp;<h3><a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">Jina 101: First Thing to Learn About Jina</a></h3>
-&nbsp;&nbsp;<a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">English</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">français</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a>
-    </td>
+### Tutorials
 
-  </tr>
-</table>
-<table>
-  <tr>
-      <td width="30%">
-    <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">
-      <img src="https://github.com/jina-ai/jina/blob/master/docs/chapters/101/img/ILLUS12.png?raw=true" alt="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited" title="Jina 101 Concept Illustration Book, Copyright by Jina AI Limited"/>
-    </a>
-    </td>
-    <td width="70%">
-&nbsp;&nbsp;<h3><a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">Jina 101: First Things to Learn About Jina</a></h3>
-&nbsp;&nbsp;<a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101">English</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ja.md">日本語</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.fr.md">Français</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.pt.md">Português</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.de.md">Deutsch</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ru.md">Русский язык</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.zh.md">中文</a> •
-  <a href="https://github.com/jina-ai/jina/tree/master/docs/chapters/101/README.ar.md">عربية</a>
-    </td>
+[Text](https://github.com/jina-ai/examples#search-text) | [Images](https://github.com/jina-ai/examples#search-images) | [Audio](https://github.com/jina-ai/examples#search-audio) | [Video](https://github.com/jina-ai/examples#search-video) | [Cross Modal](https://github.com/jina-ai/examples#cross-modality-search) | [Performance](https://github.com/jina-ai/examples#improve-performance-and-scalability) | [Extend and Share](https://github.com/jina-ai/examples#extend-and-share-jina)
 
-  </tr>
-</table>
-
-
-## Tutorials
-
-<table>
-<tr>
-<th width="10%">Level</th>
-<th width="90%">Tutorials</th>
-</tr>
-
-<tr>
-<td><h3>🐣</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/southpark-search">Build an NLP Semantic Search System</a></h4>
-Search South Park scripts and practice with Flows and Pods
-</td>
-</tr>
-
-<tr>
-<td><h3>🐣</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/my-first-jina-app">My First Jina App</a></h4>
-Using cookiecutter for bootstrap a jina app
-</td>
-</tr>
-
-<tr>
-<td><h3>🐣</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/fashion-example-query">Fashion Search with Query Language</a></h4>
-Spice up the Hello-World with Query Language
-</td>
-</tr>
-
-<tr>
-<td><h3>🕊</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/multires-lyrics-search">Use Chunk to search Lyrics</a></h4>
-Split documents in order to search on a finegrained level
-</td>
-</tr>
-
-<tr>
-<td><h3>🕊</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/cross-modal-search">Mix and Match images and captions</a></h4>
-Search cross modal to get images from captions and vice versa
-</td>
-</tr>
-
-<tr>
-<td><h3>🚀</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/tumblr-gif-search">Scale Up Video Semantic Search</a></h4>
-Improve performance using prefetching and sharding
-</td>
-</tr>
-
-<!-- <tr>
-<td><h3>🐣</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/x-as-service">From BERT-as-Service to X-as-Service</a></h4>
-Extract feature vector data using any deep learning representation
-</td>
-</tr>
-
-<tr>
-<td><h3>🚀</h3></td>
-<td>
-<h4><a href="https://github.com/jina-ai/examples/tree/master/pokedex-with-bit">Google's Big Transfer Model in (Poké-)Production</a></h4>
-Search Pokemon with state-of-the-art visual representation
-</td>
-</tr>
- -->
-</table>
-
-## Documentation
+### Documentation
 
 <a href="https://docs.jina.ai/">
 <img align="right" width="350px" src="https://github.com/jina-ai/jina/blob/master/.github/jina-docs.png?raw=true " />
