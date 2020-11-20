@@ -1,20 +1,16 @@
 <p align="center">
-<img src="https://github.com/jina-ai/jina/blob/master/.github/logo-only.gif?raw=true" alt="Jina banner" width="200px">
+<img src="https://github.com/jina-ai/jina/blob/master/.github/logo-only.gif?raw=true" alt="Jina banner" width="300px" align="center">
 </p>
+
+<h3 align="center">An easier way to build neural search in the cloud</h3>
+
 <p align="center">
-An easier way to build neural search in the cloud
+<strong><a href="#install">Install</a> • <a href="#jina-hello-world-">Hello World</a> • <a href="#tutorials">Learn</a> • <a href="#contributing">Contribute</a> • <a href="https://jobs.jina.ai">Jobs</a> • <a href="http://jina.ai">Website</a> • <a href="http://slack.jina.ai">Slack</a></strong>
 </p>
-<p align="center">
-<a href="#quick-start">Quick Start</a> • <a href="#jina-hello-world-">Hello World</a> • <a href="#tutorials">Learn</a> • <a href="#contributing">Contribute</a> • <a href="https://jobs.jina.ai">Jobs</a> • <a href="http://jina.ai">Website</a> • <a href="http://slack.jina.ai">Slack</a>
-</p><p align=center>
-<a href="#license"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/license-badge.svg?raw=true" alt="Jina" title="Jina is licensed under Apache-2.0"></a>
-<a href="https://pypi.org/project/jina/"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/python-badge.svg?raw=true" alt="Python 3.7 3.8" title="Jina supports Python 3.7 and above"></a>
-<a href="https://pypi.org/project/jina/"><img src="https://img.shields.io/pypi/v/jina?color=%23099cec&amp;label=PyPI&amp;logo=pypi&amp;logoColor=white" alt="PyPI"></a>
-<a href="https://hub.docker.com/r/jinaai/jina/tags"><img src="https://img.shields.io/docker/v/jinaai/jina?color=%23099cec&amp;label=Docker&amp;logo=docker&amp;logoColor=white&amp;sort=semver" alt="Docker Image Version (latest semver)"></a>
-<a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACI"><img src="https://github.com/jina-ai/jina/workflows/CI/badge.svg" alt="CI"></a>
-<a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACD"><img src="https://github.com/jina-ai/jina/workflows/CD/badge.svg?branch=master" alt="CD"></a>
-<a href="https://codecov.io/gh/jina-ai/jina"><img src="https://codecov.io/gh/jina-ai/jina/branch/master/graph/badge.svg" alt="codecov"></a>
+<!--
 <br>
+<br>
+<p align="center">
 <sub>
   <a href="https://github.com/jina-ai/jina">English</a> •
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.fr.md">Français</a> •
@@ -27,7 +23,17 @@ An easier way to build neural search in the cloud
   <a href="https://github.com/jina-ai/jina/blob/master/.github/i18n/README.pt_br.md">український</a>
 </sub>
 </p>
-
+-->
+<p align="center">
+<a href="#license"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/license-badge.svg?raw=true" alt="Jina" title="Jina is licensed under Apache-2.0"></a>
+<a href="https://pypi.org/project/jina/"><img src="https://github.com/jina-ai/jina/blob/master/.github/badges/python-badge.svg?raw=true" alt="Python 3.7 3.8" title="Jina supports Python 3.7 and above"></a>
+<a href="https://pypi.org/project/jina/"><img src="https://img.shields.io/pypi/v/jina?color=%23099cec&amp;label=PyPI&amp;logo=pypi&amp;logoColor=white" alt="PyPI"></a>
+<a href="https://hub.docker.com/r/jinaai/jina/tags"><img src="https://img.shields.io/docker/v/jinaai/jina?color=%23099cec&amp;label=Docker&amp;logo=docker&amp;logoColor=white&amp;sort=semver" alt="Docker Image Version (latest semver)"></a>
+<a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACI"><img src="https://github.com/jina-ai/jina/workflows/CI/badge.svg" alt="CI"></a>
+<a href="https://github.com/jina-ai/jina/actions?query=workflow%3ACD"><img src="https://github.com/jina-ai/jina/workflows/CD/badge.svg?branch=master" alt="CD"></a>
+<a href="https://codecov.io/gh/jina-ai/jina"><img src="https://codecov.io/gh/jina-ai/jina/branch/master/graph/badge.svg" alt="codecov"></a>
+</p>
+<hr>
 
 Jina is a deep learning-powered search framework for building <strong>cross-/multi-modal search systems</strong> (e.g. text, images, video, audio) in the cloud. 
 
@@ -44,7 +50,8 @@ Jina is a deep learning-powered search framework for building <strong>cross-/mul
 ❤️  **Made with Love** - Quality first, never compromises, maintained by a [full-time, venture-backed team](https://jina.ai).
 
 
-## Installation
+
+## Install
 
 On Linux/macOS with Python 3.7/3.8:
 
@@ -61,6 +68,35 @@ Our universal Docker image supports multiple architectures (including x64, x86, 
 ```bash
 docker run jinaai/jina --help
 ```
+
+## Integrations
+
+<table>
+  <tr>
+    <td width=16%><img src=".github/images/integrations/tensorflow.png"></td>
+    <td width=16%><img src=".github/images/integrations/pytorch.png"></td>
+    <td width=16%><img src=".github/images/integrations/rasa.png"></td>
+    <td width=16%><img src=".github/images/integrations/streamlit.png"></td>
+    <td width=16%><img src=".github/images/integrations/paddlepaddle.png"></td>
+    <td width=16%><img src=".github/images/integrations/mindspore.png"></td>
+  </tr>
+  <tr>
+    <td width=16%><img src=".github/images/integrations/transformers.png"></td>
+    <td width=16%><img src=".github/images/integrations/mxnet.png"></td>
+    <td width=16%><img src=".github/images/integrations/numpy.png"></td>
+    <td width=16%><img src=".github/images/integrations/protobuf.png"></td>
+    <td width=16%><img src=".github/images/integrations/python.png"></td>
+    <td width=16%><img src=".github/images/integrations/cython.png"></td>
+  </tr>
+  <tr>
+    <td width=16%><img src=".github/images/integrations/pypy.jpg"></td>
+    <td width=16%><img src=".github/images/integrations/docker.png"></td>
+    <td width=16%><img src=".github/images/integrations/grpc.png"></td>
+    <td width=16%><img src=".github/images/integrations/kubernetes.png"></td>
+    <td width=16%><img src=".github/images/integrations/tornado.png"></td>
+    <td width=16%><img src=".github/images/integrations/zeromq.png"></td>
+  </tr>
+</table>
 
 ## Jina "Hello, World!" 👋🌍
 
@@ -96,8 +132,6 @@ Intrigued? Play with different options:
 ```bash
 jina hello-world --help
 ```
-
-## Get Started
 
 #### Create
 
@@ -153,6 +187,9 @@ with Flow().add() as f, open('output.txt', 'w') as fp:
             output_fn=print,
             on_error=beep, on_always=fp.write)
 ```
+
+<details>
+<summary>Explore Hello World more</summary>
 
 #### Add Logic
 
@@ -350,6 +387,14 @@ pip install jina[hub] && jina hub new --type app
 
 This creates a Python entrypoint, YAML configs and a Dockerfile. You can start from there.
 
+</details>
+
+## How Does Jina Work?
+
+Here's a look at our architecture:
+
+<img src=".github/images/architecture.png">
+
 ## Learn
 
 <table>
@@ -527,10 +572,6 @@ Search Pokemon with state-of-the-art visual representation
 
 Apart from the learning resources we provided above, We highly recommended you go through our [**documentation**](https://docs.jina.ai) to master Jina.
 
-<a href="https://docs.jina.ai/">
-<img align="right" width="350px" src="https://github.com/jina-ai/jina/blob/master/.github/jina-docs.png?raw=true " />
-</a>
-
 Our docs are built on every push, merge, and release of Jina's master branch. Documentation for older versions is archived [here](https://github.com/jina-ai/docs/releases).
 
 <!--
@@ -558,7 +599,7 @@ Our docs are built on every push, merge, and release of Jina's master branch. Do
 
 Are you a "Doc"-star? Join us! We welcome all kinds of improvements on the documentation.
 
-## Contributing
+## Contribute
 
 We welcome all kinds of contributions from the open-source community, individuals and partners. We owe our success to your active involvement.
 
