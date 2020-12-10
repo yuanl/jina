@@ -85,7 +85,7 @@ class Document:
     """
 
     def __init__(self, document: Optional[DocumentSourceType] = None,
-                 copy: bool = False, **kwargs):
+                 copy: bool = False, custom_id: Optional[str] = None, **kwargs):
         """
 
         :param document: the document to construct from. If ``bytes`` is given
@@ -134,6 +134,12 @@ class Document:
             raise BadDocType(f'fail to construct a document from {document}, '
                              f'if you are trying to set the content '
                              f'you may use "Document(content=your_content)"') from ex
+
+        if custom_id is None:
+            import random
+            custom_id = random.randint(0,9)
+
+        self.id = custom_id
 
         self.set_attrs(**kwargs)
 
