@@ -253,9 +253,11 @@ def batching(func: Callable[[Any], np.ndarray] = None,
 
             for b in batch_iterator(data[:total_size], b_size, split_over_axis, yield_slice=yield_slice):
                 if yield_slice:
+                    valid_indices = args[slice_on + 1]
                     slice_idx = b
                     new_memmap = np.memmap(data.filename, dtype=data.dtype, mode='r', shape=data.shape)
                     b = new_memmap[slice_idx]
+                    b = b[valid_indices]
                     slice_idx = slice_idx[split_over_axis]
                     if slice_idx.start is None or slice_idx.stop is None:
                         slice_idx = None

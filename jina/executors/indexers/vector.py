@@ -126,7 +126,7 @@ class BaseNumpyIndexer(BaseVectorIndexer):
 
         :return: a numpy ndarray of vectors
         """
-        vecs = self.raw_ndarray[self.valid_indices]
+        vecs = self.raw_ndarray
         if vecs is not None:
             return self.build_advanced_index(vecs)
 
@@ -312,13 +312,13 @@ class NumpyIndexer(BaseNumpyIndexer):
         if self.size == 0:
             return None, None
         if self.metric not in {'cosine', 'euclidean'} or self.backend == 'scipy':
-            dist = self._cdist(keys, self.query_handler)
+            dist = self._cdist(keys, self.query_handler, self.valid_indices)
         elif self.metric == 'euclidean':
             _keys = _ext_A(keys)
-            dist = self._euclidean(_keys, self.query_handler)
+            dist = self._euclidean(_keys, self.query_handler, self.valid_indices)
         elif self.metric == 'cosine':
             _keys = _ext_A(_norm(keys))
-            dist = self._cosine(_keys, self.query_handler)
+            dist = self._cosine(_keys, self.query_handler, self.valid_indices)
         else:
             raise NotImplementedError(f'{self.metric} is not implemented')
 
@@ -330,12 +330,12 @@ class NumpyIndexer(BaseNumpyIndexer):
         return vecs
 
     @batching(merge_over_axis=1, slice_on=2)
-    def _euclidean(self, cached_A, raw_B):
+    def _euclidean(self, cached_A, raw_B, *args, **kwargs):
         data = _ext_B(raw_B)
         return _euclidean(cached_A, data)
 
     @batching(merge_over_axis=1, slice_on=2)
-    def _cosine(self, cached_A, raw_B):
+    def _cosine(self, cached_A, raw_B, *args, **kwargs):
         data = _ext_B(_norm(raw_B))
         return _cosine(cached_A, data)
 
