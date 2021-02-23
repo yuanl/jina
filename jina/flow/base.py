@@ -12,7 +12,7 @@ from collections import OrderedDict, defaultdict
 from contextlib import ExitStack
 from typing import Optional, Union, Tuple, List, Set, Dict, TextIO
 
-from .builder import build_required, _build_flow, _optimize_flow, _hanging_pods
+from .builder import build_required, _build_flow, _hanging_pods
 from .. import __default_host__
 from ..clients import Client, WebSocketClient
 from ..enums import FlowBuildLevel, PodRoleType, FlowInspectType
@@ -50,11 +50,7 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     .. highlight:: python
     .. code-block:: python
 
-        f = Flow(optimize_level=FlowOptimizeLevel.NONE).add(uses='forward', parallel=3)
-
-    The optimized version, i.e. :code:`Flow(optimize_level=FlowOptimizeLevel.FULL)`
-    will generate 4 Peas, but it will force the :class:`GatewayPea` to take BIND role,
-    as the head and tail routers are removed.
+        f = Flow.add(uses='forward', parallel=3)
 
     :param kwargs: other keyword arguments that will be shared by all Pods in this Flow
     :param args: Namespace args
@@ -93,7 +89,11 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     def yaml_spec(self):
         """
         get the YAML representation of the instance
+
+
         .. # noqa: DAR401
+
+
         .. # noqa: DAR201
         """
         return JAML.dump(self)
@@ -123,7 +123,11 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @property
     def last_pod(self):
         """Last pod
+
+
         .. # noqa: DAR401
+
+
         .. # noqa: DAR201
         """
         return self._last_changed_pod[-1]
@@ -132,6 +136,7 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     def last_pod(self, name: str):
         """
         Set a Pod as the last Pod in the Flow, useful when modifying the Flow.
+
 
         .. # noqa: DAR401
         :param name: the name of the existing Pod
@@ -168,6 +173,7 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
               name: str = 'joiner', *args, **kwargs) -> 'BaseFlow':
         """
         Add a blocker to the Flow, wait until all peas defined in **needs** completed.
+
 
         .. # noqa: DAR401
         :param needs: list of service names to wait
@@ -207,6 +213,7 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
         Note there are shortcut versions of this method.
         Recommend to use :py:meth:`add_encoder`, :py:meth:`add_preprocessor`,
         :py:meth:`add_router`, :py:meth:`add_indexer` whenever possible.
+
 
         .. # noqa: DAR401
         :param needs: the name of the Pod(s) that this Pod receives data from.
@@ -366,12 +373,12 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
                 with f.build(copy_flow=True) as fl:
                     fl.search()
 
+
         .. # noqa: DAR401
         """
 
         op_flow = copy.deepcopy(self) if copy_flow else self
 
-        _pod_edges = set()
         if op_flow.args.inspect == FlowInspectType.COLLECT:
             op_flow.gather_inspect(copy_flow=False)
 
@@ -398,10 +405,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
                 if start not in op_flow._pod_nodes:
                     raise FlowMissingPodError(f'{start} is not in this flow, misspelled name?')
                 _outgoing_map[start].append(end)
-                _pod_edges.add((start, end))
 
         op_flow = _build_flow(op_flow, _outgoing_map)
-        op_flow = _optimize_flow(op_flow, _outgoing_map, _pod_edges)
         hanging_pods = _hanging_pods(op_flow)
         if hanging_pods:
             self.logger.warning(f'{hanging_pods} are hanging in this flow with no pod receiving from them, '
@@ -443,6 +448,7 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
         Note that this method has a timeout of ``timeout_ready`` set in CLI,
         which is inherited all the way from :class:`jina.peapods.peas.BasePea`
 
+
         .. # noqa: DAR401
 
         :return: this instance
@@ -477,12 +483,16 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @property
     def num_pods(self) -> int:
         """Get the number of Pods in this Flow
+
+
         .. # noqa: DAR201"""
         return len(self._pod_nodes)
 
     @property
     def num_peas(self) -> int:
         """Get the number of peas (parallel count) in this Flow
+
+
         .. # noqa: DAR201"""
         return sum(v.num_peas for v in self._pod_nodes.values())
 
@@ -689,6 +699,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @build_required(FlowBuildLevel.GRAPH)
     def port_expose(self) -> int:
         """Return the exposed port of the gateway
+
+
         .. # noqa: DAR201"""
         return self._pod_nodes['gateway'].port_expose
 
@@ -696,6 +708,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @build_required(FlowBuildLevel.GRAPH)
     def host(self) -> str:
         """Return the local address of the gateway
+
+
         .. # noqa: DAR201"""
         return self._pod_nodes['gateway'].host
 
@@ -703,6 +717,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @build_required(FlowBuildLevel.GRAPH)
     def address_private(self) -> str:
         """Return the private IP address of the gateway for connecting from other machine in the same network
+
+
         .. # noqa: DAR201"""
         return get_internal_ip()
 
@@ -710,6 +726,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @build_required(FlowBuildLevel.GRAPH)
     def address_public(self) -> str:
         """Return the public IP address of the gateway for connecting from other machine in the public network
+
+
         .. # noqa: DAR201"""
         return get_public_ip()
 
@@ -771,6 +789,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @property
     def workspace_id(self) -> Dict[str, str]:
         """Get all Pods' ``workspace_id`` values in a dict
+
+
         .. # noqa: DAR201"""
         return {k: p.args.workspace_id for k, p in self if hasattr(p.args, 'workspace_id')}
 
@@ -794,6 +814,8 @@ class BaseFlow(JAMLCompatible, ExitStack, metaclass=FlowType):
     @property
     def identity(self) -> Dict[str, str]:
         """Get all Pods' ``identity`` values in a dict
+
+
         .. # noqa: DAR201
         """
         return {k: p.args.identity for k, p in self}

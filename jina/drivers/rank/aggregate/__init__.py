@@ -3,7 +3,7 @@ from collections import defaultdict, namedtuple
 
 import numpy as np
 
-from ....executors.rankers import Chunk2DocRanker
+from ....executors.rankers import Chunk2DocRanker, COL_STR_TYPE
 from ....types.document import Document
 from ....types.score import NamedScore
 
@@ -113,20 +113,20 @@ class Chunk2DocRankDriver(BaseAggregateMatchesRankerDriver):
         parent_id_chunk_id_map = defaultdict(list)
         matches_by_id = defaultdict(Document)
         for chunk in docs:
-            query_meta[chunk.id] = chunk.get_attrs(*self.exec.required_keys)
+            query_meta[chunk.id] = chunk.get_attrs(*self._exec_query_keys) if self._exec_query_keys else None
             for match in chunk.matches:
                 match_info = self._extract_query_match_info(match=match, query=chunk)
                 match_idx.append(match_info)
-                match_meta[match.id] = match.get_attrs(*self.exec.required_keys)
+                match_meta[match.id] = match.get_attrs(*self._exec_match_keys) if self._exec_match_keys else None
                 parent_id_chunk_id_map[match.parent_id].append(match.id)
                 matches_by_id[match.id] = match
 
         if match_idx:
             match_idx = np.array(match_idx,
                                  dtype=[
-                                     (Chunk2DocRanker.COL_MATCH_PARENT_ID, np.object),
-                                     (Chunk2DocRanker.COL_MATCH_ID, np.object),
-                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, np.object),
+                                     (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
+                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
+                                     (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
                                      (Chunk2DocRanker.COL_SCORE, np.float64)
                                  ]
                                  )
@@ -192,20 +192,21 @@ class AggregateMatches2DocRankDriver(BaseAggregateMatchesRankerDriver):
         parent_id_chunk_id_map = defaultdict(list)
         matches_by_id = defaultdict(Document)
 
-        query_meta[context_doc.id] = context_doc.get_attrs(*self.exec.required_keys)
+        query_meta[context_doc.id] = context_doc.get_attrs(*self._exec_query_keys) if self._exec_query_keys else None
+
         for match in docs:
             match_info = self._extract_query_match_info(match=match, query=context_doc)
             match_idx.append(match_info)
-            match_meta[match.id] = match.get_attrs(*self.exec.required_keys)
+            match_meta[match.id] = match.get_attrs(*self._exec_match_keys) if self._exec_match_keys else None
             parent_id_chunk_id_map[match.parent_id].append(match.id)
             matches_by_id[match.id] = match
 
         if match_idx:
             match_idx = np.array(match_idx,
                                  dtype=[
-                                     (Chunk2DocRanker.COL_MATCH_PARENT_ID, np.object),
-                                     (Chunk2DocRanker.COL_MATCH_ID, np.object),
-                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, np.object),
+                                     (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
+                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
+                                     (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
                                      (Chunk2DocRanker.COL_SCORE, np.float64)
                                  ]
                                  )
