@@ -100,9 +100,9 @@ jobs:
       - id: file_changes
         uses: jitterbit/get-changed-files@v1
       - name: check black
-        run: |
-          pip install black==20.8b1
-          black -S --check ${{ steps.file_changes.outputs.all }}
+        run: ./scripts/black.sh
+        env:
+          CHANGED_FILES: ${{ steps.file_changes.outputs.all }}
 
   prep-testbed:
     runs-on: ubuntu-18.04
