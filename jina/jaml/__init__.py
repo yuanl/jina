@@ -328,7 +328,7 @@ class JAML:
 
             yaml.add_constructor(tag, f_y, JinaLoader)
 
-        yaml.add_path_resolver(tag, [(dict, cls.__name__)], Loader=JinaLoader)
+        yaml.add_path_resolver(tag, [cls.__name__], Loader=JinaLoader)
         return cls
 
 

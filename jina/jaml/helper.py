@@ -69,6 +69,24 @@ class JinaConstructor(FullConstructor):
             mapping[key] = value
         return mapping
 
+    def get_single_data(self):
+        # Ensure that the stream contains a single document and construct it.
+        node = self.get_single_node()
+        if node is not None:
+            r = self.construct_document(node)
+            if isinstance(r, dict):
+                from jina.jaml import JAMLCompatible
+                _tmp_v = list(r.values())[0]
+                _tmp_k = list(r.keys())[0]
+
+                # "flatten" the dict into JAMLCompatible object
+                if len(r) == 1 and f'!{_tmp_k}' in self.yaml_constructors and isinstance(_tmp_v, JAMLCompatible):
+                    return _tmp_v
+                else:
+                    return r
+            else:
+                return r
+        return None
 
 class JinaResolver(Resolver):
     """Remove `on|On|ON` as bool resolver."""
