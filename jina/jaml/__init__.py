@@ -1,3 +1,4 @@
+import copy
 import os
 import re
 import tempfile
@@ -92,6 +93,30 @@ class JAML:
         return r
 
     @staticmethod
+    def safe_load(stream,
+                  substitute: bool = False,
+                  context: Dict[str, Any] = None):
+        """
+        Parse the first YAML document in a stream
+        and produce the corresponding Python object.
+
+        Resolve only basic YAML tags. This is known
+        to be safe for untrusted input.
+
+
+        :param substitute: substitute environment, internal reference and context variables.
+        :param context: context replacement variables in a dict, the value of the dict is the replacement.
+        :param stream: the stream to load
+        :return: the Python object
+        """
+        _tmp = copy.deepcopy(JinaLoader)
+        _tmp.yaml_path_resolvers.clear()
+        r = yaml.load(stream, Loader=_tmp)
+        if substitute:
+            r = JAML.expand_dict(r, context)
+        return r
+
+    @staticmethod
     def load_no_tags(stream, **kwargs):
         """
         Load yaml object but ignore all customized tags, e.g. !Executor, !Driver, !Flow.
@@ -101,7 +126,7 @@ class JAML:
         :return: the Python object
         """
         safe_yml = '\n'.join(v if not re.match(r'^[\s-]*?!\b', v) else v.replace('!', '__cls: ') for v in stream)
-        return JAML.load(safe_yml, **kwargs)
+        return JAML.safe_load(safe_yml, **kwargs)
 
     @staticmethod
     def expand_dict(d: Dict, context: Union[Dict, SimpleNamespace, None] = None,
@@ -242,6 +267,20 @@ class JAML:
         return d
 
     @staticmethod
+    def safe_dump(data, stream=None, **kwargs):
+        """
+        Serialize a Python object into a YAML stream.
+        Produce only basic YAML tags.
+        If stream is None, return the produced string instead.
+
+        :param data: the data to serialize
+        :param stream: the output stream
+        :param **kwargs: other kwargs
+        :return: the yaml output
+        """
+        return yaml.safe_dump(data, stream=stream, default_flow_style=False, sort_keys=False, **kwargs)
+
+    @staticmethod
     def dump(data, stream=None, **kwargs):
         """
         Serialize a Python object into a YAML stream.
@@ -288,6 +327,8 @@ class JAML:
                 return constructor.construct_yaml_object(node, cls)
 
             yaml.add_constructor(tag, f_y, JinaLoader)
+
+        yaml.add_path_resolver(tag, [(dict, cls.__name__)], Loader=JinaLoader)
         return cls
 
 
@@ -418,19 +459,19 @@ class JAMLCompatible(metaclass=JAMLCompatibleType):
         with stream as fp:
             # first load yml with no tag
             no_tag_yml = JAML.load_no_tags(fp)
+            if no_tag_yml and substitute:
+                # expand variables
+                no_tag_yml = JAML.expand_dict(no_tag_yml, context)
             if no_tag_yml:
                 # extra arguments are parsed to inject_config
                 no_tag_yml = cls.inject_config(no_tag_yml, **kwargs)
             else:
                 raise BadConfigSource(f'can not construct {cls} from an empty {source}. nothing to read from there')
-            if substitute:
-                # expand variables
-                no_tag_yml = JAML.expand_dict(no_tag_yml, context)
             if allow_py_modules:
                 # also add YAML parent path to the search paths
                 load_py_modules(no_tag_yml, extra_search_paths=(os.path.dirname(s_path),) if s_path else None)
             # revert yaml's tag and load again, this time with substitution
-            revert_tag_yml = JAML.dump(no_tag_yml).replace('__cls: ', '!')
+            revert_tag_yml = JAML.safe_dump(no_tag_yml).replace('__cls: ', '!')
 
             # load into object, no more substitute
             return JAML.load(revert_tag_yml, substitute=False)
