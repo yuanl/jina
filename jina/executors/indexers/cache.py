@@ -74,10 +74,15 @@ class DocCache(BaseCache):
     default_fields = (ID_KEY,)
 
     @deprecated_alias(field=('fields', 0))
-    def __init__(self,
-                 index_filename: Optional[str] = None,
-                 fields: Optional[Union[str, Tuple[str]]] = None, # str for backwards compatibility
-                 *args, **kwargs):
+    def __init__(
+        self,
+        index_filename: Optional[str] = None,
+        fields: Optional[
+            Union[str, Tuple[str]]
+        ] = None,  # str for backwards compatibility
+        *args,
+        **kwargs,
+    ):
         if not index_filename:
             # create a new temp file if not exist
             index_filename = tempfile.NamedTemporaryFile(delete=False).name
