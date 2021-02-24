@@ -21,6 +21,7 @@ def validate(req):
 # TODO(Deepankar): with `restful: True` few of the asyncio tests are flaky.
 # Though it runs fine locally, results in - `RuntimeError - Event loop closed` in CI (Disabling for now)
 
+
 def documents(start_index, end_index):
     for i in range(start_index, end_index):
         with Document() as doc:
@@ -70,7 +71,9 @@ async def test_run_async_flow_async_input(restful, input_fn, mocker):
 async def run_async_flow_5s(restful):
     # WaitDriver pause 5s makes total roundtrip ~5s
     with AsyncFlow(restful=restful).add(uses='- !WaitDriver {}') as f:
-        async for r in f.index_ndarray(np.random.random([num_docs, 4]), on_done=validate):
+        async for r in f.index_ndarray(
+            np.random.random([num_docs, 4]), on_done=validate
+        ):
             assert isinstance(r, Response)
 
 

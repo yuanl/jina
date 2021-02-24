@@ -28,11 +28,11 @@ def _subsample(iterable, sampling_rate: float = None, size: int = None, **kwargs
 
 
 def _input_lines(
-        lines: Iterable[str] = None,
-        filepath: str = None,
-        read_mode: str = 'r',
-        line_format: str = 'json',
-        **kwargs
+    lines: Iterable[str] = None,
+    filepath: str = None,
+    read_mode: str = 'r',
+    line_format: str = 'json',
+    **kwargs,
 ) -> Iterator[Union[str, bytes]]:
     """Input function that iterates over list of strings, it can be used in the Flow API.
 
@@ -66,41 +66,39 @@ def _input_lines(
     else:
         raise ValueError('"filepath" and "lines" can not be both empty')
 
-def _input_ndjson(
-        fp: Iterable[str],
-        field_resolver: Dict[str, str] = None,
-        **kwargs
-):
+
+def _input_ndjson(fp: Iterable[str], field_resolver: Dict[str, str] = None, **kwargs):
     from jina import Document
 
     for line in _subsample(fp, **kwargs):
         value = json.loads(line)
         if 'groundtruth' in value and 'document' in value:
-            yield Document(value['document'], field_resolver), Document(value['groundtruth'], field_resolver)
+            yield Document(value['document'], field_resolver), Document(
+                value['groundtruth'], field_resolver
+            )
         else:
             yield Document(value, field_resolver)
 
 
-def _input_csv(
-        fp: Iterable[str],
-        field_resolver: Dict[str, str] = None,
-        **kwargs
-):
+def _input_csv(fp: Iterable[str], field_resolver: Dict[str, str] = None, **kwargs):
     from jina import Document
+
     lines = csv.DictReader(fp)
     for value in _subsample(lines, **kwargs):
         if 'groundtruth' in value and 'document' in value:
-            yield Document(value['document'], field_resolver), Document(value['groundtruth'], field_resolver)
+            yield Document(value['document'], field_resolver), Document(
+                value['groundtruth'], field_resolver
+            )
         else:
             yield Document(value, field_resolver)
 
 
 def _input_files(
-        patterns: Union[str, List[str]],
-        recursive: bool = True,
-        size: int = None,
-        sampling_rate: float = None,
-        read_mode: str = None,
+    patterns: Union[str, List[str]],
+    recursive: bool = True,
+    size: int = None,
+    sampling_rate: float = None,
+    read_mode: str = None,
 ) -> Iterator[Union[str, bytes]]:
     r"""Input function that iterates over files, it can be used in the Flow API.
 
@@ -138,7 +136,7 @@ def _input_files(
 
 
 def _input_ndarray(
-        array: 'np.ndarray', axis: int = 0, size: int = None, shuffle: bool = False
+    array: 'np.ndarray', axis: int = 0, size: int = None, shuffle: bool = False
 ) -> Iterator[Any]:
     """Input function that iterates over a numpy array, it can be used in the Flow API.
 

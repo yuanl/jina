@@ -65,8 +65,13 @@ def test_traverse_match_chunk(doc_req):
 
 def test_traverse_root_match_chunk(doc_req):
     ds = list(doc_req.docs.traverse(['r', 'c', 'm', 'cm']))
-    assert (len(ds) == num_docs + num_chunks_per_doc * num_docs +
-            num_matches_per_doc * num_docs + num_docs * num_chunks_per_doc * num_matches_per_chunk)
+    assert (
+        len(ds)
+        == num_docs
+        + num_chunks_per_doc * num_docs
+        + num_matches_per_doc * num_docs
+        + num_docs * num_chunks_per_doc * num_matches_per_chunk
+    )
 
 
 def test_batching_traverse(doc_req):

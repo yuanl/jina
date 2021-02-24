@@ -38,12 +38,8 @@ class ReduceAllDriver(RecursiveMixin, BaseRecursiveDriver):
         request.docs.extend(docs)
 
     def _apply_all(
-            self,
-            docs: 'DocumentSet',
-            context_doc: 'Document',
-            field: str,
-            *args,
-            **kwargs) -> None:
+        self, docs: 'DocumentSet', context_doc: 'Document', field: str, *args, **kwargs
+    ) -> None:
 
         if context_doc.id not in self.doc_pointers:
             self.doc_pointers[context_doc.id] = context_doc
@@ -55,12 +51,8 @@ class CollectEvaluationDriver(ReduceAllDriver):
     """Merge all evaluations into one, grouped by ``doc.id`` """
 
     def _apply_all(
-            self,
-            docs: 'DocumentSet',
-            context_doc: 'Document',
-            field: str,
-            *args,
-            **kwargs) -> None:
+        self, docs: 'DocumentSet', context_doc: 'Document', field: str, *args, **kwargs
+    ) -> None:
         if context_doc.id not in self.doc_pointers:
             self.doc_pointers[context_doc.id] = context_doc.evaluations
         else:
@@ -78,13 +70,14 @@ class ConcatEmbedDriver(ReduceAllDriver):
         self.doc_pointers.clear()
 
     def _apply_all(
-            self,
-            docs: 'DocumentSet',
-            context_doc: 'Document',
-            field: str,
-            concatenate: bool = False,
-            *args,
-            **kwargs):
+        self,
+        docs: 'DocumentSet',
+        context_doc: 'Document',
+        field: str,
+        concatenate: bool = False,
+        *args,
+        **kwargs
+    ):
         doc = context_doc
         if concatenate:
             doc.embedding = np.concatenate(self.doc_pointers[doc.id], axis=0)

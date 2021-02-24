@@ -4,10 +4,12 @@ from jina.types.score import NamedScore
 
 
 def test_named_score():
-    score = NamedScore(op_name='operation',
-                       value=10.0,
-                       ref_id='10' * 16,
-                       description='score description')
+    score = NamedScore(
+        op_name='operation',
+        value=10.0,
+        ref_id='10' * 16,
+        description='score description',
+    )
 
     assert score.op_name == 'operation'
     assert score.value == 10.0
@@ -18,6 +20,7 @@ def test_named_score():
 @pytest.mark.parametrize('copy', [True, False])
 def test_named_score_from_proto(copy):
     from jina.proto.jina_pb2 import NamedScoreProto
+
     proto = NamedScoreProto()
     proto.op_name = 'operation'
     proto.value = 10.0

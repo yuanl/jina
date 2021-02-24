@@ -8,39 +8,59 @@ from jina.types.sets import DocumentSet
 
 DISCOUNT_VAL = 0.5
 
-class MockMaxRanker(Chunk2DocRanker):
 
-    def _get_score(self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs):
+class MockMaxRanker(Chunk2DocRanker):
+    def _get_score(
+        self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs
+    ):
         return self.get_doc_id(match_idx), match_idx[self.COL_SCORE].max()
 
 
 class MockMinRanker(Chunk2DocRanker):
-
-    def _get_score(self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs):
-        return self.get_doc_id(match_idx), 1. / (1. + match_idx[self.COL_SCORE].min())
+    def _get_score(
+        self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs
+    ):
+        return self.get_doc_id(match_idx), 1.0 / (1.0 + match_idx[self.COL_SCORE].min())
 
 
 class MockLengthRanker(Chunk2DocRanker):
     def __init__(self, *args, **kwargs):
-        super().__init__(query_required_keys=['length'], match_required_keys=['length'], *args, **kwargs)
+        super().__init__(
+            query_required_keys=['length'],
+            match_required_keys=['length'],
+            *args,
+            **kwargs
+        )
 
-    def _get_score(self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs):
-        return match_idx[0][self.COL_PARENT_ID], match_chunk_meta[match_idx[0][self.COL_DOC_CHUNK_ID]]['length']
+    def _get_score(
+        self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs
+    ):
+        return (
+            match_idx[0][self.COL_PARENT_ID],
+            match_chunk_meta[match_idx[0][self.COL_DOC_CHUNK_ID]]['length'],
+        )
 
 
 class MockPriceDiscountRanker(Chunk2DocRanker):
     def __init__(self, *args, **kwargs):
-        super().__init__(query_required_keys=('tags__price', 'tags__discount'), match_required_keys=('tags__price', 'tags__discount'), *args, **kwargs)
+        super().__init__(
+            query_required_keys=('tags__price', 'tags__discount'),
+            match_required_keys=('tags__price', 'tags__discount'),
+            *args,
+            **kwargs
+        )
 
-    def _get_score(self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs):
+    def _get_score(
+        self, match_idx, query_chunk_meta, match_chunk_meta, *args, **kwargs
+    ):
         price = match_chunk_meta[match_idx[0][self.COL_DOC_CHUNK_ID]]['tags__price']
-        discount = match_chunk_meta[match_idx[0][self.COL_DOC_CHUNK_ID]]['tags__discount']
-        return match_idx[0][self.COL_PARENT_ID], \
-               price - price * discount
+        discount = match_chunk_meta[match_idx[0][self.COL_DOC_CHUNK_ID]][
+            'tags__discount'
+        ]
+        return match_idx[0][self.COL_PARENT_ID], price - price * discount
 
 
 class SimpleChunk2DocRankDriver(Chunk2DocRankDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -140,13 +160,23 @@ def create_chunk_chunk_matches_to_score():
     return Document(doc)
 
 
-@pytest.mark.parametrize('executor', [MockMaxRanker(), MockPriceDiscountRanker(), MockLengthRanker()])
+@pytest.mark.parametrize(
+    'executor', [MockMaxRanker(), MockPriceDiscountRanker(), MockLengthRanker()]
+)
 @pytest.mark.parametrize('keep_source_matches_as_chunks', [False, True])
 def test_chunk2doc_ranker_driver_mock_ranker(keep_source_matches_as_chunks, executor):
     doc = create_document_to_score()
-    driver = SimpleChunk2DocRankDriver(keep_source_matches_as_chunks=keep_source_matches_as_chunks)
+    driver = SimpleChunk2DocRankDriver(
+        keep_source_matches_as_chunks=keep_source_matches_as_chunks
+    )
     driver.attach(executor=executor, runtime=None)
-    driver._traverse_apply(DocumentSet([doc, ]))
+    driver._traverse_apply(
+        DocumentSet(
+            [
+                doc,
+            ]
+        )
+    )
 
     scale = 1 if not isinstance(executor, MockPriceDiscountRanker) else DISCOUNT_VAL
     assert len(doc.matches) == 4
@@ -169,10 +199,18 @@ def test_chunk2doc_ranker_driver_mock_ranker(keep_source_matches_as_chunks, exec
 @pytest.mark.parametrize('keep_source_matches_as_chunks', [False, True])
 def test_chunk2doc_ranker_driver_min_ranker(keep_source_matches_as_chunks):
     doc = create_document_to_score()
-    driver = SimpleChunk2DocRankDriver(keep_source_matches_as_chunks=keep_source_matches_as_chunks)
+    driver = SimpleChunk2DocRankDriver(
+        keep_source_matches_as_chunks=keep_source_matches_as_chunks
+    )
     executor = MockMinRanker()
     driver.attach(executor=executor, runtime=None)
-    driver._traverse_apply(DocumentSet([doc, ]))
+    driver._traverse_apply(
+        DocumentSet(
+            [
+                doc,
+            ]
+        )
+    )
     assert len(doc.matches) == 4
     assert doc.matches[0].id == '40'
     assert doc.matches[0].score.value == pytest.approx(1 / (1 + 4), 0.0001)
@@ -191,8 +229,12 @@ def test_chunk2doc_ranker_driver_min_ranker(keep_source_matches_as_chunks):
 
 @pytest.mark.parametrize('keep_source_matches_as_chunks', [False, True])
 def test_chunk2doc_ranker_driver_traverse_apply(keep_source_matches_as_chunks):
-    docs = [create_chunk_matches_to_score(), ]
-    driver = SimpleChunk2DocRankDriver(keep_source_matches_as_chunks=keep_source_matches_as_chunks)
+    docs = [
+        create_chunk_matches_to_score(),
+    ]
+    driver = SimpleChunk2DocRankDriver(
+        keep_source_matches_as_chunks=keep_source_matches_as_chunks
+    )
     executor = MockMinRanker()
     driver.attach(executor=executor, runtime=None)
     driver._traverse_apply(DocumentSet(docs))
@@ -200,14 +242,18 @@ def test_chunk2doc_ranker_driver_traverse_apply(keep_source_matches_as_chunks):
         assert len(doc.matches) == 2
         for idx, match in enumerate(doc.matches):
             # the score should be 1 / (1 + id * 2)
-            assert match.score.value == pytest.approx(1. / (1 + float(match.id[0]) * 2.), 0.0001)
+            assert match.score.value == pytest.approx(
+                1.0 / (1 + float(match.id[0]) * 2.0), 0.0001
+            )
             expected_chunk_matches_length = 2 if keep_source_matches_as_chunks else 0
             assert len(match.chunks) == expected_chunk_matches_length
 
 
 @pytest.mark.skip('TODO: https://github.com/jina-ai/jina/issues/1014')
 def test_chunk2doc_ranker_driver_traverse_apply_larger_range():
-    docs = [create_chunk_chunk_matches_to_score(), ]
+    docs = [
+        create_chunk_chunk_matches_to_score(),
+    ]
     driver = SimpleChunk2DocRankDriver(traversal_paths=('cc', 'c'))
     executor = MockMinRanker()
     driver.attach(executor=executor, runtime=None)
@@ -222,8 +268,8 @@ def test_chunk2doc_ranker_driver_traverse_apply_larger_range():
             # the score should be 1 / (1 + id * 2)
             if m.score.value < min_granularity_2:
                 min_granularity_2 = m.score.value
-            assert m.score.value == pytest.approx(1. / (1 + float(m.id) * 2.), 0.0001)
+            assert m.score.value == pytest.approx(1.0 / (1 + float(m.id) * 2.0), 0.0001)
             assert m.score.ref_id == 101
         match = doc.matches[0]
         assert match.score.ref_id == 100
-        assert match.score.value == pytest.approx(1. / (1 + min_granularity_2), 0.0001)
+        assert match.score.value == pytest.approx(1.0 / (1 + min_granularity_2), 0.0001)

@@ -6,10 +6,28 @@ from tests import validate_callback
 
 
 def test_crud_in_readme(mocker):
-    docs = [Document(id='🐲', embedding=np.array([0, 0]), tags={'guardian': 'Azure Dragon', 'position': 'East'}),
-            Document(id='🐦', embedding=np.array([1, 0]), tags={'guardian': 'Vermilion Bird', 'position': 'South'}),
-            Document(id='🐢', embedding=np.array([0, 1]), tags={'guardian': 'Black Tortoise', 'position': 'North'}),
-            Document(id='🐯', embedding=np.array([1, 1]), tags={'guardian': 'White Tiger', 'position': 'West'})]
+    docs = [
+        Document(
+            id='🐲',
+            embedding=np.array([0, 0]),
+            tags={'guardian': 'Azure Dragon', 'position': 'East'},
+        ),
+        Document(
+            id='🐦',
+            embedding=np.array([1, 0]),
+            tags={'guardian': 'Vermilion Bird', 'position': 'South'},
+        ),
+        Document(
+            id='🐢',
+            embedding=np.array([0, 1]),
+            tags={'guardian': 'Black Tortoise', 'position': 'North'},
+        ),
+        Document(
+            id='🐯',
+            embedding=np.array([1, 1]),
+            tags={'guardian': 'White Tiger', 'position': 'West'},
+        ),
+    ]
 
     # create
     m = mocker.Mock()
@@ -30,9 +48,7 @@ def test_crud_in_readme(mocker):
     m = mocker.Mock()
 
     with f:
-        f.search(docs[0],
-                 top_k=3,
-                 on_done=m)
+        f.search(docs[0], top_k=3, on_done=m)
     validate_callback(m, validate)
 
     # update
@@ -55,9 +71,7 @@ def test_crud_in_readme(mocker):
     m = mocker.Mock()
 
     with f:
-        f.search(docs[0],
-                 top_k=1,
-                 on_done=m)
+        f.search(docs[0], top_k=1, on_done=m)
     validate_callback(m, validate)
 
     # delete
@@ -75,7 +89,5 @@ def test_crud_in_readme(mocker):
     m = mocker.Mock()
 
     with f:
-        f.search(docs[0],
-                 top_k=4,
-                 on_done=m)
+        f.search(docs[0], top_k=4, on_done=m)
     validate_callback(m, validate)

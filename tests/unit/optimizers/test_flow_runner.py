@@ -24,9 +24,15 @@ def test_flow_runner(tmpdir, mocker):
         overwrite_workspace=True,
     )
 
-    flow_runner.run(workspace=workspace, trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace})
+    flow_runner.run(
+        workspace=workspace,
+        trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace},
+    )
     # Test overwriting
-    flow_runner.run(workspace=workspace, trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace})
+    flow_runner.run(
+        workspace=workspace,
+        trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace},
+    )
 
     flow_runner = SingleFlowRunner(
         flow_yaml='flow.yml',
@@ -35,7 +41,11 @@ def test_flow_runner(tmpdir, mocker):
         execution_method='search',
     )
 
-    flow_runner.run(workspace=workspace, trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace}, callback=callback)
+    flow_runner.run(
+        workspace=workspace,
+        trial_parameters={'JINA_TEST_FLOW_RUNNER_WORKSPACE': workspace},
+        callback=callback,
+    )
 
     m.assert_called()
     assert os.path.exists(os.path.join(workspace, 'tmp2'))

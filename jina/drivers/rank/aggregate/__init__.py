@@ -16,10 +16,7 @@ if False:
 class BaseAggregateMatchesRankerDriver(BaseRankDriver):
     """Drivers inherited from this Driver focus on aggregating scores from `chunks` to its `parents`."""
 
-    def __init__(self,
-                 keep_source_matches_as_chunks: bool = False,
-                 *args,
-                 **kwargs):
+    def __init__(self, keep_source_matches_as_chunks: bool = False, *args, **kwargs):
         """
 
         :param keep_source_matches_as_chunks: A flag to indicate if the driver must return the old matches of the query or its chunks
@@ -36,19 +33,25 @@ class BaseAggregateMatchesRankerDriver(BaseRankDriver):
         super().__init__(*args, **kwargs)
         self.keep_source_matches_as_chunks = keep_source_matches_as_chunks
 
-    QueryMatchInfo = namedtuple('QueryMatchInfo', 'match_parent_id match_id query_id score')
+    QueryMatchInfo = namedtuple(
+        'QueryMatchInfo', 'match_parent_id match_id query_id score'
+    )
 
     def _extract_query_match_info(self, match: Document, query: Document):
-        return self.QueryMatchInfo(match_parent_id=match.parent_id,
-                                   match_id=match.id,
-                                   query_id=query.id,
-                                   score=match.score.value)
+        return self.QueryMatchInfo(
+            match_parent_id=match.parent_id,
+            match_id=match.id,
+            query_id=query.id,
+            score=match.score.value,
+        )
 
-    def _insert_query_matches(self,
-                              query: Document,
-                              parent_id_chunk_id_map: dict,
-                              chunk_matches_by_id: dict,
-                              docs_scores: 'np.ndarray'):
+    def _insert_query_matches(
+        self,
+        query: Document,
+        parent_id_chunk_id_map: dict,
+        chunk_matches_by_id: dict,
+        docs_scores: 'np.ndarray',
+    ):
         """
         :param query: the query Document where the resulting matches will be inserted
         :param parent_id_chunk_id_map: a map with parent_id as key and list of previous matches ids as values
@@ -59,8 +62,7 @@ class BaseAggregateMatchesRankerDriver(BaseRankDriver):
         op_name = self.exec.__class__.__name__
         for doc_id, score in docs_scores:
             m = Document(id=doc_id)
-            m.score = NamedScore(op_name=op_name,
-                                 value=score)
+            m.score = NamedScore(op_name=op_name, value=score)
             if self.keep_source_matches_as_chunks:
                 for match_chunk_id in parent_id_chunk_id_map[doc_id]:
                     m.chunks.append(chunk_matches_by_id[match_chunk_id])
@@ -97,9 +99,9 @@ class Chunk2DocRankDriver(BaseAggregateMatchesRankerDriver):
     def __init__(self, traversal_paths: Tuple[str] = ('c',), *args, **kwargs):
         super().__init__(traversal_paths=traversal_paths, *args, **kwargs)
 
-    def _apply_all(self, docs: 'DocumentSet',
-                   context_doc: 'Document', *args,
-                   **kwargs) -> None:
+    def _apply_all(
+        self, docs: 'DocumentSet', context_doc: 'Document', *args, **kwargs
+    ) -> None:
         """
         :param docs: the chunks of the ``context_doc``, they are at depth_level ``k``
         :param context_doc: the owner of ``docs``, it is at depth_level ``k-1``
@@ -113,30 +115,41 @@ class Chunk2DocRankDriver(BaseAggregateMatchesRankerDriver):
         parent_id_chunk_id_map = defaultdict(list)
         matches_by_id = defaultdict(Document)
         for chunk in docs:
-            query_meta[chunk.id] = chunk.get_attrs(*self._exec_query_keys) if self._exec_query_keys else None
+            query_meta[chunk.id] = (
+                chunk.get_attrs(*self._exec_query_keys)
+                if self._exec_query_keys
+                else None
+            )
             for match in chunk.matches:
                 match_info = self._extract_query_match_info(match=match, query=chunk)
                 match_idx.append(match_info)
-                match_meta[match.id] = match.get_attrs(*self._exec_match_keys) if self._exec_match_keys else None
+                match_meta[match.id] = (
+                    match.get_attrs(*self._exec_match_keys)
+                    if self._exec_match_keys
+                    else None
+                )
                 parent_id_chunk_id_map[match.parent_id].append(match.id)
                 matches_by_id[match.id] = match
 
         if match_idx:
-            match_idx = np.array(match_idx,
-                                 dtype=[
-                                     (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_SCORE, np.float64)
-                                 ]
-                                 )
+            match_idx = np.array(
+                match_idx,
+                dtype=[
+                    (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_SCORE, np.float64),
+                ],
+            )
 
             docs_scores = self.exec_fn(match_idx, query_meta, match_meta)
 
-            self._insert_query_matches(query=context_doc,
-                                       parent_id_chunk_id_map=parent_id_chunk_id_map,
-                                       chunk_matches_by_id=matches_by_id,
-                                       docs_scores=docs_scores)
+            self._insert_query_matches(
+                query=context_doc,
+                parent_id_chunk_id_map=parent_id_chunk_id_map,
+                chunk_matches_by_id=matches_by_id,
+                docs_scores=docs_scores,
+            )
 
 
 class AggregateMatches2DocRankDriver(BaseAggregateMatchesRankerDriver):
@@ -166,8 +179,9 @@ class AggregateMatches2DocRankDriver(BaseAggregateMatchesRankerDriver):
     def __init__(self, traversal_paths: Tuple[str] = ('m',), *args, **kwargs):
         super().__init__(traversal_paths=traversal_paths, *args, **kwargs)
 
-    def _apply_all(self, docs: 'DocumentSet', context_doc: 'Document', *args,
-                   **kwargs) -> None:
+    def _apply_all(
+        self, docs: 'DocumentSet', context_doc: 'Document', *args, **kwargs
+    ) -> None:
         """
 
         :param docs: the matches of the ``context_doc``, they are at granularity ``k``
@@ -192,29 +206,40 @@ class AggregateMatches2DocRankDriver(BaseAggregateMatchesRankerDriver):
         parent_id_chunk_id_map = defaultdict(list)
         matches_by_id = defaultdict(Document)
 
-        query_meta[context_doc.id] = context_doc.get_attrs(*self._exec_query_keys) if self._exec_query_keys else None
+        query_meta[context_doc.id] = (
+            context_doc.get_attrs(*self._exec_query_keys)
+            if self._exec_query_keys
+            else None
+        )
 
         for match in docs:
             match_info = self._extract_query_match_info(match=match, query=context_doc)
             match_idx.append(match_info)
-            match_meta[match.id] = match.get_attrs(*self._exec_match_keys) if self._exec_match_keys else None
+            match_meta[match.id] = (
+                match.get_attrs(*self._exec_match_keys)
+                if self._exec_match_keys
+                else None
+            )
             parent_id_chunk_id_map[match.parent_id].append(match.id)
             matches_by_id[match.id] = match
 
         if match_idx:
-            match_idx = np.array(match_idx,
-                                 dtype=[
-                                     (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
-                                     (Chunk2DocRanker.COL_SCORE, np.float64)
-                                 ]
-                                 )
+            match_idx = np.array(
+                match_idx,
+                dtype=[
+                    (Chunk2DocRanker.COL_PARENT_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_DOC_CHUNK_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_QUERY_CHUNK_ID, COL_STR_TYPE),
+                    (Chunk2DocRanker.COL_SCORE, np.float64),
+                ],
+            )
 
             docs_scores = self.exec_fn(match_idx, query_meta, match_meta)
             # This ranker will change the current matches
             context_doc.ClearField('matches')
-            self._insert_query_matches(query=context_doc,
-                                       parent_id_chunk_id_map=parent_id_chunk_id_map,
-                                       chunk_matches_by_id=matches_by_id,
-                                       docs_scores=docs_scores)
+            self._insert_query_matches(
+                query=context_doc,
+                parent_id_chunk_id_map=parent_id_chunk_id_map,
+                chunk_matches_by_id=matches_by_id,
+                docs_scores=docs_scores,
+            )

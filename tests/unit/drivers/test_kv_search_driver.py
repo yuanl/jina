@@ -10,8 +10,9 @@ from jina.types.ndarray.generic import NdArray
 
 
 class MockIndexer(BaseKVIndexer):
-
-    def add(self, keys: Iterable[str], values: Iterable[bytes], *args, **kwargs) -> None:
+    def add(
+        self, keys: Iterable[str], values: Iterable[bytes], *args, **kwargs
+    ) -> None:
         pass
 
     def query(self, key: str) -> Optional[bytes]:
@@ -42,7 +43,6 @@ class MockIndexer(BaseKVIndexer):
 
 
 class SimpleKVSearchDriver(KVSearchDriver):
-
     def __init__(self, traversal_paths=['r'], *args, **kwargs):
         super().__init__(traversal_paths=traversal_paths, *args, **kwargs)
 
@@ -86,7 +86,7 @@ def document_with_matches_on_chunks():
             for m in range(5):
                 with Document() as match:
                     match.id = str(m + 2) * 16
-                    match.score.value = 1.
+                    match.score.value = 1.0
                 chunk.matches.append(match)
         doc.chunks.append(chunk)
     return doc
@@ -137,7 +137,9 @@ def test_vectorsearch_driver_mock_indexer_traverse_apply(document):
         np.testing.assert_equal(embedding_array, np.array([chunk.id]))
 
 
-def test_vectorsearch_driver_mock_indexer_with_matches_on_chunks(document_with_matches_on_chunks):
+def test_vectorsearch_driver_mock_indexer_with_matches_on_chunks(
+    document_with_matches_on_chunks,
+):
     driver = SimpleKVSearchDriver(traversal_paths=('cm',))
     executor = MockIndexer()
     driver.attach(executor=executor, runtime=None)

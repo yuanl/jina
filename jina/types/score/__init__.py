@@ -47,8 +47,12 @@ class NamedScore(ProtoTypeMixin):
 
     """
 
-    def __init__(self, score: Optional[jina_pb2.NamedScoreProto] = None,
-                 copy: bool = False, **kwargs):
+    def __init__(
+        self,
+        score: Optional[jina_pb2.NamedScoreProto] = None,
+        copy: bool = False,
+        **kwargs,
+    ):
         """Set constructor."""
         self._pb_body = jina_pb2.NamedScoreProto()
         try:
@@ -61,7 +65,9 @@ class NamedScore(ProtoTypeMixin):
                 # note ``None`` is not considered as a bad type
                 raise ValueError(f'{typename(score)} is not recognizable')
         except Exception as ex:
-            raise BadNamedScoreType(f'fail to construct a NamedScore from {score}') from ex
+            raise BadNamedScoreType(
+                f'fail to construct a NamedScore from {score}'
+            ) from ex
 
         self.set_attrs(**kwargs)
 
@@ -89,8 +95,11 @@ class NamedScore(ProtoTypeMixin):
                 self._pb_body.ClearField(k)
                 getattr(self._pb_body, k).update(v)
             else:
-                if hasattr(NamedScore, k) and isinstance(getattr(NamedScore, k), property) and getattr(NamedScore,
-                                                                                                       k).fset:
+                if (
+                    hasattr(NamedScore, k)
+                    and isinstance(getattr(NamedScore, k), property)
+                    and getattr(NamedScore, k).fset
+                ):
                     # if class property has a setter
                     setattr(self, k, v)
                 elif hasattr(self._pb_body, k):

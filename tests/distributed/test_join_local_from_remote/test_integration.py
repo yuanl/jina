@@ -22,7 +22,8 @@ def doc_to_index():
 @pytest.fixture
 def client():
     args = set_client_cli_parser().parse_args(
-        ['--host', 'localhost', '--port-expose', '45678'])
+        ['--host', 'localhost', '--port-expose', '45678']
+    )
 
     return Client(args)
 
@@ -41,10 +42,11 @@ def test_flow(docker_compose, doc_to_index, client, mocker):
 
     client.search(input_fn=[doc_to_index], on_done=validate_resp)
 
-    assert_request(method='get',
-                   url=f'http://localhost:8000/flows/{flow_id}')
+    assert_request(method='get', url=f'http://localhost:8000/flows/{flow_id}')
 
-    assert_request(method='delete',
-                   url=f'http://localhost:8000/flows/{flow_id}',
-                   payload={'workspace': False})
+    assert_request(
+        method='delete',
+        url=f'http://localhost:8000/flows/{flow_id}',
+        payload={'workspace': False},
+    )
     m.assert_called_once()

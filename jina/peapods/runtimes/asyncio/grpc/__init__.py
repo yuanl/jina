@@ -11,15 +11,20 @@ __all__ = ['GRPCRuntime']
 
 
 class GRPCRuntime(AsyncNewLoopRuntime):
-
     async def async_setup(self):
         if not self.args.proxy and os.name != 'nt':
             os.unsetenv('http_proxy')
             os.unsetenv('https_proxy')
-        self.server = grpc.aio.server(options=[('grpc.max_send_message_length', self.args.max_message_size),
-                                               ('grpc.max_receive_message_length', self.args.max_message_size)])
+        self.server = grpc.aio.server(
+            options=[
+                ('grpc.max_send_message_length', self.args.max_message_size),
+                ('grpc.max_receive_message_length', self.args.max_message_size),
+            ]
+        )
         self.zmqlet = AsyncZmqlet(self.args, logger=self.logger)
-        jina_pb2_grpc.add_JinaRPCServicer_to_server(AsyncPrefetchCall(self.args, self.zmqlet), self.server)
+        jina_pb2_grpc.add_JinaRPCServicer_to_server(
+            AsyncPrefetchCall(self.args, self.zmqlet), self.server
+        )
         bind_addr = f'{self.args.host}:{self.args.port_expose}'
         self.server.add_insecure_port(bind_addr)
         await self.server.start()

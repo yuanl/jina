@@ -28,8 +28,9 @@ def test_queryset_with_struct(random_workspace, mocker):
         doc.tags['label'] = f'label{doc_id % 2 + 1}'
         docs.append(doc)
 
-    f = (Flow()
-         .add(uses='- !FilterQL | {lookups: {tags__label__in: [label1, label2]}, traversal_paths: [r]}'))
+    f = Flow().add(
+        uses='- !FilterQL | {lookups: {tags__label__in: [label1, label2]}, traversal_paths: [r]}'
+    )
 
     def validate_all_docs(resp):
         mock1()
@@ -45,7 +46,16 @@ def test_queryset_with_struct(random_workspace, mocker):
         # keep all the docs
         f.index(docs, on_done=validate_all_docs)
         # keep only the docs with label2
-        qs = QueryLang({'name': 'FilterQL', 'priority': 1, 'parameters': {'lookups': {'tags__label': 'label2'}, 'traversal_paths': ['r']}})
+        qs = QueryLang(
+            {
+                'name': 'FilterQL',
+                'priority': 1,
+                'parameters': {
+                    'lookups': {'tags__label': 'label2'},
+                    'traversal_paths': ['r'],
+                },
+            }
+        )
         f.index(docs, queryset=qs, on_done=validate_label2_docs)
 
     mock1.assert_called_once()

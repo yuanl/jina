@@ -11,16 +11,12 @@ from ..types.sets import DocumentSet
 class BaseEncodeDriver(BaseExecutableDriver):
     """Drivers inherited from this Driver will bind :meth:`encode` by default """
 
-    def __init__(self,
-                 executor: str = None,
-                 method: str = 'encode',
-                 *args, **kwargs):
+    def __init__(self, executor: str = None, method: str = 'encode', *args, **kwargs):
         super().__init__(executor, method, *args, **kwargs)
 
 
 class EncodeDriver(FastRecursiveMixin, BaseEncodeDriver):
-    """Extract the content from documents and call executor and do encoding
-    """
+    """Extract the content from documents and call executor and do encoding"""
 
     def _apply_all(self, docs: 'DocumentSet', *args, **kwargs) -> None:
         contents, docs_pts = docs.all_contents
@@ -30,7 +26,8 @@ class EncodeDriver(FastRecursiveMixin, BaseEncodeDriver):
             if len(docs_pts) != embeds.shape[0]:
                 self.logger.error(
                     f'mismatched {len(docs_pts)} docs from level {docs_pts[0].granularity} '
-                    f'and a {embeds.shape} shape embedding, the first dimension must be the same')
+                    f'and a {embeds.shape} shape embedding, the first dimension must be the same'
+                )
             for doc, embedding in zip(docs_pts, embeds):
                 doc.embedding = embedding
 
@@ -56,13 +53,11 @@ class LegacyEncodeDriver(RecursiveMixin, BaseEncodeDriver):
 
     class CacheDocumentSet:
         """Helper class to accumulate documents from different DocumentSets in a single DocumentSet
-         to help guarantee that the encoder driver can consume documents in fixed batch sizes to allow
-         the EncoderExecutors to leverage its batching abilities.
-         It is useful to have batching even when chunks are involved"""
+        to help guarantee that the encoder driver can consume documents in fixed batch sizes to allow
+        the EncoderExecutors to leverage its batching abilities.
+        It is useful to have batching even when chunks are involved"""
 
-        def __init__(self,
-                     capacity: Optional[int] = None,
-                     *args, **kwargs):
+        def __init__(self, capacity: Optional[int] = None, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self.capacity = capacity
             self._doc_set = DocumentSet(docs_proto=[])
@@ -83,7 +78,7 @@ class LegacyEncodeDriver(RecursiveMixin, BaseEncodeDriver):
             :return: the subset of the docs
             """
             docs_to_append = min(len(docs), self.available_capacity)
-            self._doc_set.extend(docs[: docs_to_append])
+            self._doc_set.extend(docs[:docs_to_append])
             return DocumentSet(docs[docs_to_append:])
 
         def __len__(self):
@@ -97,14 +92,17 @@ class LegacyEncodeDriver(RecursiveMixin, BaseEncodeDriver):
             """
             return self._doc_set
 
-    def __init__(self,
-                 batch_size: Optional[int] = None,
-                 *args, **kwargs):
+    def __init__(self, batch_size: Optional[int] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        warnings.warn(f'this drivers will be removed soon, use {EncodeDriver!r} instead', DeprecationWarning)
+        warnings.warn(
+            f'this drivers will be removed soon, use {EncodeDriver!r} instead',
+            DeprecationWarning,
+        )
         self.batch_size = batch_size
         if self.batch_size:
-            self.cache_set = LegacyEncodeDriver.CacheDocumentSet(capacity=self.batch_size)
+            self.cache_set = LegacyEncodeDriver.CacheDocumentSet(
+                capacity=self.batch_size
+            )
         else:
             self.cache_set = None
 
@@ -124,11 +122,13 @@ class LegacyEncodeDriver(RecursiveMixin, BaseEncodeDriver):
             embeds = self.exec_fn(contents)
             if embeds is None:
                 self.logger.error(
-                    f'{self.exec_fn!r} returns nothing, you may want to check the implementation of {self.exec!r}')
+                    f'{self.exec_fn!r} returns nothing, you may want to check the implementation of {self.exec!r}'
+                )
             elif len(docs_pts) != embeds.shape[0]:
                 self.logger.error(
                     f'mismatched {len(docs_pts)} docs from level {docs_pts[0].granularity} '
-                    f'and a {embeds.shape} shape embedding, the first dimension must be the same')
+                    f'and a {embeds.shape} shape embedding, the first dimension must be the same'
+                )
             else:
                 for doc, embedding in zip(docs_pts, embeds):
                     doc.embedding = embedding
@@ -138,7 +138,9 @@ class LegacyEncodeDriver(RecursiveMixin, BaseEncodeDriver):
             cached_docs = self.cache_set.get()
             if len(cached_docs) > 0:
                 self._apply_batch(cached_docs)
-            self.cache_set = LegacyEncodeDriver.CacheDocumentSet(capacity=self.batch_size)
+            self.cache_set = LegacyEncodeDriver.CacheDocumentSet(
+                capacity=self.batch_size
+            )
 
     def _apply_all(self, docs: 'DocumentSet', *args, **kwargs) -> None:
         if self.cache_set is not None:

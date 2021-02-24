@@ -50,10 +50,9 @@ class PeaType(type):
 
     def __new__(cls, name, bases, dct):
         _cls = super().__new__(cls, name, bases, dct)
-        PeaType._dct.update({name: {'cls': cls,
-                                    'name': name,
-                                    'bases': bases,
-                                    'dct': dct}})
+        PeaType._dct.update(
+            {name: {'cls': cls, 'name': name, 'bases': bases, 'dct': dct}}
+        )
         return _cls
 
     def __call__(cls, *args, **kwargs) -> 'PeaType':

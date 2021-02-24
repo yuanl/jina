@@ -23,10 +23,7 @@ def docs_to_encode(num_docs):
 
 
 class MockEncoder(BaseEncoder):
-    def __init__(self,
-                 driver_batch_size: int,
-                 total_num_docs: int,
-                 *args, **kwargs):
+    def __init__(self, driver_batch_size: int, total_num_docs: int, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.driver_batch_size = driver_batch_size
         if self.driver_batch_size:
@@ -44,14 +41,15 @@ class MockEncoder(BaseEncoder):
             if not self.is_last_batch:
                 assert len(data) == self.driver_batch_size
             else:
-                left_to_run_in_request = self.total_num_docs - (self.driver_batch_size*self.total_passes)
+                left_to_run_in_request = self.total_num_docs - (
+                    self.driver_batch_size * self.total_passes
+                )
                 assert len(data) == left_to_run_in_request
             self.id_pass += 1
         return data
 
 
 class SimpleEncoderDriverLegacy(LegacyEncodeDriver):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -60,7 +58,9 @@ class SimpleEncoderDriverLegacy(LegacyEncodeDriver):
         return self._exec_fn
 
 
-@pytest.mark.parametrize('batch_size', [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 20, 100, 10000])
+@pytest.mark.parametrize(
+    'batch_size', [None, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 20, 100, 10000]
+)
 def test_encode_driver(batch_size, docs_to_encode, num_docs):
     driver = SimpleEncoderDriverLegacy(batch_size=batch_size)
     executor = MockEncoder(driver_batch_size=batch_size, total_num_docs=num_docs)

@@ -144,7 +144,9 @@ def test_slice_ql_on_matches_and_chunks():
     assert len(docs[-1].matches) == 2  # slice on level 1 of chunks
 
     assert len(docs[-1].chunks[0].chunks) == 2  # slice on level 2 for matches of chunks
-    assert len(docs[-1].chunks[-1].chunks) == 2  # slice on level 2 for matches of chunks
+    assert (
+        len(docs[-1].chunks[-1].chunks) == 2
+    )  # slice on level 2 for matches of chunks
 
     assert len(docs[-1].chunks[0].matches) == 10  # traverses directly on matches
     assert len(docs[-1].chunks[0].matches[0].chunks) == 10

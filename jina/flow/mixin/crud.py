@@ -10,11 +10,15 @@ from ...helper import deprecated_alias
 
 class CRUDFlowMixin:
     """The synchronous version of the Mixin for CRUD in Flow"""
-    def train(self, input_fn: InputFnType,
-              on_done: CallbackFnType = None,
-              on_error: CallbackFnType = None,
-              on_always: CallbackFnType = None,
-              **kwargs):
+
+    def train(
+        self,
+        input_fn: InputFnType,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Do training on the current Flow
 
         :param input_fn: An iterator of bytes. If not given, then you have to specify it in **kwargs**.
@@ -25,17 +29,24 @@ class CRUDFlowMixin:
         :return: results
         """
         warnings.warn(f'{self.train} is under heavy refactoring', FutureWarning)
-        return self._get_client(**kwargs).train(input_fn, on_done, on_error, on_always, **kwargs)
+        return self._get_client(**kwargs).train(
+            input_fn, on_done, on_error, on_always, **kwargs
+        )
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def index_ndarray(self, array: 'np.ndarray',
-                      axis: int = 0,
-                      size: int = None,
-                      shuffle: bool = False,
-                      on_done: CallbackFnType = None,
-                      on_error: CallbackFnType = None,
-                      on_always: CallbackFnType = None,
-                      **kwargs):
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def index_ndarray(
+        self,
+        array: 'np.ndarray',
+        axis: int = 0,
+        size: int = None,
+        shuffle: bool = False,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Using numpy ndarray as the index source for the current Flow
 
         :param array: the numpy ndarray data source
@@ -49,15 +60,30 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_ndarray
-        return self._get_client(**kwargs).index(_input_ndarray(array, axis, size, shuffle),
-                                                on_done, on_error, on_always, data_type=DataInputType.CONTENT, **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def search_ndarray(self, array: 'np.ndarray', axis: int = 0, size: int = None, shuffle: bool = False,
-                       on_done: CallbackFnType = None,
-                       on_error: CallbackFnType = None,
-                       on_always: CallbackFnType = None,
-                       **kwargs):
+        return self._get_client(**kwargs).index(
+            _input_ndarray(array, axis, size, shuffle),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.CONTENT,
+            **kwargs,
+        )
+
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def search_ndarray(
+        self,
+        array: 'np.ndarray',
+        axis: int = 0,
+        size: int = None,
+        shuffle: bool = False,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Use a numpy ndarray as the query source for searching on the current Flow
 
         :param array: the numpy ndarray data source
@@ -70,23 +96,34 @@ class CRUDFlowMixin:
         :param kwargs: accepts all keyword arguments of `jina client` CLI
         """
         from ...clients.sugary_io import _input_ndarray
-        self._get_client(**kwargs).search(_input_ndarray(array, axis, size, shuffle),
-                                          on_done, on_error, on_always, data_type=DataInputType.CONTENT, **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def index_lines(self,
-                    lines: Union[Iterable[str], TextIO] = None,
-                    filepath: str = None,
-                    size: int = None,
-                    sampling_rate: float = None,
-                    read_mode: str = 'r',
-                    line_format: str = 'json',
-                    field_resolver: Dict[str, str] = None,
-                    on_done: CallbackFnType = None,
-                    on_error: CallbackFnType = None,
-                    on_always: CallbackFnType = None,
-                    **kwargs):
-        """ Use a list of lines as the index source for indexing on the current Flow
+        self._get_client(**kwargs).search(
+            _input_ndarray(array, axis, size, shuffle),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.CONTENT,
+            **kwargs,
+        )
+
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def index_lines(
+        self,
+        lines: Union[Iterable[str], TextIO] = None,
+        filepath: str = None,
+        size: int = None,
+        sampling_rate: float = None,
+        read_mode: str = 'r',
+        line_format: str = 'json',
+        field_resolver: Dict[str, str] = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of lines as the index source for indexing on the current Flow
         :param lines: a list of strings, each is considered as d document
         :param filepath: a text file that each line contains a document
         :param size: the maximum number of the documents
@@ -104,25 +141,36 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_lines
-        return self._get_client(**kwargs).index(
-            _input_lines(lines, filepath,
-                         size=size,
-                         sampling_rate=sampling_rate,
-                         read_mode=read_mode,
-                         line_format=line_format,
-                         field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
 
-    def index_ndjson(self,
-                     lines: Union[Iterable[str], TextIO],
-                     field_resolver: Dict[str, str] = None,
-                     size: int = None,
-                     sampling_rate: float = None,
-                     on_done: CallbackFnType = None,
-                     on_error: CallbackFnType = None,
-                     on_always: CallbackFnType = None,
-                     **kwargs):
-        """ Use a list of lines as the index source for indexing on the current Flow
+        return self._get_client(**kwargs).index(
+            _input_lines(
+                lines,
+                filepath,
+                size=size,
+                sampling_rate=sampling_rate,
+                read_mode=read_mode,
+                line_format=line_format,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
+
+    def index_ndjson(
+        self,
+        lines: Union[Iterable[str], TextIO],
+        field_resolver: Dict[str, str] = None,
+        size: int = None,
+        sampling_rate: float = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of lines as the index source for indexing on the current Flow
         :param lines: a list of strings, each is considered as d document
         :param size: the maximum number of the documents
         :param sampling_rate: the sampling rate between [0, 1]
@@ -136,23 +184,33 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_ndjson
-        return self._get_client(**kwargs).index(
-            _input_ndjson(lines,
-                          size=size,
-                          sampling_rate=sampling_rate,
-                          field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
 
-    def index_csv(self,
-                  lines: Union[Iterable[str], TextIO],
-                  field_resolver: Dict[str, str] = None,
-                  size: int = None,
-                  sampling_rate: float = None,
-                  on_done: CallbackFnType = None,
-                  on_error: CallbackFnType = None,
-                  on_always: CallbackFnType = None,
-                  **kwargs):
-        """ Use a list of lines as the index source for indexing on the current Flow
+        return self._get_client(**kwargs).index(
+            _input_ndjson(
+                lines,
+                size=size,
+                sampling_rate=sampling_rate,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
+
+    def index_csv(
+        self,
+        lines: Union[Iterable[str], TextIO],
+        field_resolver: Dict[str, str] = None,
+        size: int = None,
+        sampling_rate: float = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of lines as the index source for indexing on the current Flow
         :param lines: a list of strings, each is considered as d document
         :param size: the maximum number of the documents
         :param sampling_rate: the sampling rate between [0, 1]
@@ -166,23 +224,33 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_csv
-        return self._get_client(**kwargs).index(
-            _input_csv(lines,
-                       size=size,
-                       sampling_rate=sampling_rate,
-                       field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
 
-    def search_csv(self,
-                   lines: Union[Iterable[str], TextIO],
-                   field_resolver: Dict[str, str] = None,
-                   size: int = None,
-                   sampling_rate: float = None,
-                   on_done: CallbackFnType = None,
-                   on_error: CallbackFnType = None,
-                   on_always: CallbackFnType = None,
-                   **kwargs):
-        """ Use a list of lines as the index source for indexing on the current Flow
+        return self._get_client(**kwargs).index(
+            _input_csv(
+                lines,
+                size=size,
+                sampling_rate=sampling_rate,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
+
+    def search_csv(
+        self,
+        lines: Union[Iterable[str], TextIO],
+        field_resolver: Dict[str, str] = None,
+        size: int = None,
+        sampling_rate: float = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of lines as the index source for indexing on the current Flow
         :param lines: a list of strings, each is considered as d document
         :param size: the maximum number of the documents
         :param sampling_rate: the sampling rate between [0, 1]
@@ -196,21 +264,37 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_csv
+
         return self._get_client(**kwargs).search(
-            _input_csv(lines,
-                       size=size,
-                       sampling_rate=sampling_rate,
-                       field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
+            _input_csv(
+                lines,
+                size=size,
+                sampling_rate=sampling_rate,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def index_files(self, patterns: Union[str, Iterable[str]], recursive: bool = True,
-                    size: int = None, sampling_rate: float = None, read_mode: str = None,
-                    on_done: CallbackFnType = None,
-                    on_error: CallbackFnType = None,
-                    on_always: CallbackFnType = None,
-                    **kwargs):
-        """ Use a set of files as the index source for indexing on the current Flow
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def index_files(
+        self,
+        patterns: Union[str, Iterable[str]],
+        recursive: bool = True,
+        size: int = None,
+        sampling_rate: float = None,
+        read_mode: str = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a set of files as the index source for indexing on the current Flow
         :param patterns: The pattern may contain simple shell-style wildcards, e.g. '\*.py', '[\*.zip, \*.gz]'
         :param recursive: If recursive is true, the pattern '**' will match any files and
                     zero or more directories and subdirectories.
@@ -225,17 +309,32 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_files
-        return self._get_client(**kwargs).index(_input_files(patterns, recursive, size, sampling_rate, read_mode),
-                                                on_done, on_error, on_always, data_type=DataInputType.CONTENT, **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def search_files(self, patterns: Union[str, Iterable[str]], recursive: bool = True,
-                     size: int = None, sampling_rate: float = None, read_mode: str = None,
-                     on_done: CallbackFnType = None,
-                     on_error: CallbackFnType = None,
-                     on_always: CallbackFnType = None,
-                     **kwargs):
-        """ Use a set of files as the query source for searching on the current Flow
+        return self._get_client(**kwargs).index(
+            _input_files(patterns, recursive, size, sampling_rate, read_mode),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.CONTENT,
+            **kwargs,
+        )
+
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def search_files(
+        self,
+        patterns: Union[str, Iterable[str]],
+        recursive: bool = True,
+        size: int = None,
+        sampling_rate: float = None,
+        read_mode: str = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a set of files as the query source for searching on the current Flow
         :param patterns: The pattern may contain simple shell-style wildcards, e.g. '\*.py', '[\*.zip, \*.gz]'
         :param recursive: If recursive is true, the pattern '**' will match any files and
                     zero or more directories and subdirectories.
@@ -250,24 +349,34 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_files
-        return self._get_client(**kwargs).search(_input_files(patterns, recursive, size, sampling_rate, read_mode),
-                                                 on_done, on_error, on_always, data_type=DataInputType.CONTENT,
-                                                 **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def search_lines(self,
-                     lines: Union[Iterable[str], TextIO] = None,
-                     filepath: str = None,
-                     field_resolver: Dict[str, str] = None,
-                     size: int = None,
-                     sampling_rate: float = None,
-                     read_mode: str = 'r',
-                     line_format: str = 'json',
-                     on_done: CallbackFnType = None,
-                     on_error: CallbackFnType = None,
-                     on_always: CallbackFnType = None,
-                     **kwargs):
-        """ Use a list of files as the query source for searching on the current Flow
+        return self._get_client(**kwargs).search(
+            _input_files(patterns, recursive, size, sampling_rate, read_mode),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.CONTENT,
+            **kwargs,
+        )
+
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def search_lines(
+        self,
+        lines: Union[Iterable[str], TextIO] = None,
+        filepath: str = None,
+        field_resolver: Dict[str, str] = None,
+        size: int = None,
+        sampling_rate: float = None,
+        read_mode: str = 'r',
+        line_format: str = 'json',
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of files as the query source for searching on the current Flow
         :param filepath: a text file that each line contains a document
         :param lines: a list of strings, each is considered as d document
         :param size: the maximum number of the documents
@@ -285,25 +394,36 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_lines
-        return self._get_client(**kwargs).search(
-            _input_lines(lines, filepath,
-                         size=size,
-                         sampling_rate=sampling_rate,
-                         read_mode=read_mode,
-                         line_format=line_format,
-                         field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
 
-    def search_ndjson(self,
-                      lines: Union[Iterable[str], TextIO],
-                      field_resolver: Dict[str, str] = None,
-                      size: int = None,
-                      sampling_rate: float = None,
-                      on_done: CallbackFnType = None,
-                      on_error: CallbackFnType = None,
-                      on_always: CallbackFnType = None,
-                      **kwargs):
-        """ Use a list of files as the query source for searching on the current Flow
+        return self._get_client(**kwargs).search(
+            _input_lines(
+                lines,
+                filepath,
+                size=size,
+                sampling_rate=sampling_rate,
+                read_mode=read_mode,
+                line_format=line_format,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
+
+    def search_ndjson(
+        self,
+        lines: Union[Iterable[str], TextIO],
+        field_resolver: Dict[str, str] = None,
+        size: int = None,
+        sampling_rate: float = None,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
+        """Use a list of files as the query source for searching on the current Flow
         :param lines: a list of strings, each is considered as d document
         :param size: the maximum number of the documents
         :param sampling_rate: the sampling rate between [0, 1]
@@ -317,19 +437,32 @@ class CRUDFlowMixin:
         :return: results
         """
         from ...clients.sugary_io import _input_ndjson
-        return self._get_client(**kwargs).search(
-            _input_ndjson(lines,
-                          size=size,
-                          sampling_rate=sampling_rate,
-                          field_resolver=field_resolver),
-            on_done, on_error, on_always, data_type=DataInputType.AUTO, **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def index(self, input_fn: InputFnType,
-              on_done: CallbackFnType = None,
-              on_error: CallbackFnType = None,
-              on_always: CallbackFnType = None,
-              **kwargs):
+        return self._get_client(**kwargs).search(
+            _input_ndjson(
+                lines,
+                size=size,
+                sampling_rate=sampling_rate,
+                field_resolver=field_resolver,
+            ),
+            on_done,
+            on_error,
+            on_always,
+            data_type=DataInputType.AUTO,
+            **kwargs,
+        )
+
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def index(
+        self,
+        input_fn: InputFnType,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Do indexing on the current Flow
         :param input_fn: An iterator of bytes. If not given, then you have to specify it in **kwargs**.
         :param on_done: the function to be called when the :class:`Request` object is resolved.
@@ -338,13 +471,18 @@ class CRUDFlowMixin:
         :param kwargs: accepts all keyword arguments of `jina client` CLI
         :return: results
         """
-        return self._get_client(**kwargs).index(input_fn, on_done, on_error, on_always, **kwargs)
+        return self._get_client(**kwargs).index(
+            input_fn, on_done, on_error, on_always, **kwargs
+        )
 
-    def update(self, input_fn: InputFnType,
-               on_done: CallbackFnType = None,
-               on_error: CallbackFnType = None,
-               on_always: CallbackFnType = None,
-               **kwargs):
+    def update(
+        self,
+        input_fn: InputFnType,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Updates Documents on the current Flow
 
         :param input_fn: An iterator of bytes. If not given, then you have to specify it in **kwargs**.
@@ -353,13 +491,18 @@ class CRUDFlowMixin:
         :param on_always: the function to be called when the :class:`Request` object is  is either resolved or rejected.
         :param kwargs: accepts all keyword arguments of `jina client` CLI
         """
-        self._get_client(**kwargs).update(input_fn, on_done, on_error, on_always, **kwargs)
+        self._get_client(**kwargs).update(
+            input_fn, on_done, on_error, on_always, **kwargs
+        )
 
-    def delete(self, ids: Iterable[str],
-               on_done: CallbackFnType = None,
-               on_error: CallbackFnType = None,
-               on_always: CallbackFnType = None,
-               **kwargs):
+    def delete(
+        self,
+        ids: Iterable[str],
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Do deletion on the current Flow
 
         :param ids: An iterator of bytes. If not given, then you have to specify it in **kwargs**.
@@ -370,12 +513,17 @@ class CRUDFlowMixin:
         """
         self._get_client(**kwargs).delete(ids, on_done, on_error, on_always, **kwargs)
 
-    @deprecated_alias(buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1))
-    def search(self, input_fn: InputFnType,
-               on_done: CallbackFnType = None,
-               on_error: CallbackFnType = None,
-               on_always: CallbackFnType = None,
-               **kwargs):
+    @deprecated_alias(
+        buffer=('input_fn', 1), callback=('on_done', 1), output_fn=('on_done', 1)
+    )
+    def search(
+        self,
+        input_fn: InputFnType,
+        on_done: CallbackFnType = None,
+        on_error: CallbackFnType = None,
+        on_always: CallbackFnType = None,
+        **kwargs,
+    ):
         """Do searching on the current Flow
         It will start a :py:class:`CLIClient` and call :py:func:`search`.
 
@@ -386,4 +534,6 @@ class CRUDFlowMixin:
         :param kwargs: accepts all keyword arguments of `jina client` CLI
         :return: results
         """
-        return self._get_client(**kwargs).search(input_fn, on_done, on_error, on_always, **kwargs)
+        return self._get_client(**kwargs).search(
+            input_fn, on_done, on_error, on_always, **kwargs
+        )

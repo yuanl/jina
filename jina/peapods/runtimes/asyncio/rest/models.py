@@ -19,7 +19,10 @@ def build_model_from_pb(name: str, pb_model: Callable):
 
     dp = MessageToDict(pb_model(), including_default_value_fields=True)
 
-    all_fields = {k: (name if k in ('chunks', 'matches') else type(v), Field(default=v)) for k, v in dp.items()}
+    all_fields = {
+        k: (name if k in ('chunks', 'matches') else type(v), Field(default=v))
+        for k, v in dp.items()
+    }
     if pb_model == QueryLangProto:
         all_fields['parameters'] = (Dict, Field(default={}))
 
@@ -34,8 +37,9 @@ default_request_size = set_client_cli_parser().parse_args([]).request_size
 
 class JinaRequestModel(BaseModel):
     # To avoid an error while loading the request model schema on swagger, we've added an example.
-    data: Union[List[JinaDocumentModel], List[Dict[str, Any]], List[str], List[bytes]] = \
-        Field(..., example=[Document().dict()])
+    data: Union[
+        List[JinaDocumentModel], List[Dict[str, Any]], List[str], List[bytes]
+    ] = Field(..., example=[Document().dict()])
     request_size: Optional[int] = default_request_size
     mime_type: Optional[str] = ''
     queryset: Optional[List[JinaQueryLangModel]] = None

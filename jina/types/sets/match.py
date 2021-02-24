@@ -14,6 +14,7 @@ class MatchSet(DocumentSet):
     :para reference_doc: Reference :class:`Document` for the sub-documents
     :type reference_doc: :class:`Document`
     """
+
     def __init__(self, docs_proto, reference_doc: 'Document'):
         """Set constructor method."""
         super().__init__(docs_proto)
@@ -28,11 +29,14 @@ class MatchSet(DocumentSet):
         :rtype: :class:`Document` view
         """
         from ..document import Document
+
         m = self._docs_proto.add()
         m.CopyFrom(document.proto)
         match = Document(m)
 
-        match.set_attrs(granularity=self.granularity, adjacency=self.adjacency, **kwargs)
+        match.set_attrs(
+            granularity=self.granularity, adjacency=self.adjacency, **kwargs
+        )
         match.score.ref_id = self._ref_doc.id
 
         if not match.mime_type:
