@@ -436,6 +436,7 @@ class BaseExecutor(JAMLCompatible, metaclass=ExecutorType):
         tmp = fill_metas_with_defaults(raw_config)
         tmp['metas']['pea_id'] = pea_id
         tmp['metas']['read_only'] = read_only
+        raw_config.pop('metas')
 
         return tmp
 

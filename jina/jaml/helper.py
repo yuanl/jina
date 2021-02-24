@@ -38,6 +38,25 @@ class JinaConstructor(FullConstructor):
             raise ValueError(f'unhashable key: {key}')
         return key
 
+    def get_single_data(self):
+        # Ensure that the stream contains a single document and construct it.
+        node = self.get_single_node()
+        if node is not None:
+            r = self.construct_document(node)
+            if isinstance(r, dict):
+                from jina.jaml import JAMLCompatible
+                _tmp_v = list(r.values())[0]
+                _tmp_k = list(r.keys())[0]
+
+                # "flatten" the dict into JAMLCompatible object
+                if len(r) == 1 and f'!{_tmp_k}' in self.yaml_constructors and isinstance(_tmp_v, JAMLCompatible):
+                    return _tmp_v
+                else:
+                    return r
+            else:
+                return r
+        return None
+
     def construct_mapping(self, node, deep=True):
         """
         Build the mapping from node.
@@ -90,7 +109,6 @@ class JinaLoader(Reader, Scanner, Parser, Composer, JinaConstructor, JinaResolve
         Composer.__init__(self)
         JinaConstructor.__init__(self)
         JinaResolver.__init__(self)
-
 
 
 # remove on|On|ON resolver
@@ -157,6 +175,8 @@ def parse_config_source(path: Union[str, TextIO, Dict],
             _defaults = fp.read()
         path = path.replace('- !!', '- !').replace('|', '\n        with: ')  # for indent, I know, its nasty
         path = _defaults.replace('*', path)
+        return io.StringIO(path), None
+    elif allow_raw_yaml_content:
         return io.StringIO(path), None
     elif allow_class_type and path.isidentifier():
         # possible class name
