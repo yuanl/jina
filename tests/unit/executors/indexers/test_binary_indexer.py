@@ -185,4 +185,4 @@ def test_binarypb_benchmark(test_metas, delete_on_dump):
         idxer.save()
 
     time_end = time.time()
-    print(f'{delete_on_dump=}, entries={entries}. took {time_end - time_now} seconds')
+    print(f'delete_on_dump = {delete_on_dump}, entries={entries}. took {time_end - time_now} seconds')
