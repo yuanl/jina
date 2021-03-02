@@ -171,7 +171,7 @@ class BinaryPbIndexer(BaseKVIndexer):
         if not len(keys):
             return
 
-        with self.write_handler as writer:
+        with self.get_add_handler() as writer:
             self._add(keys, values, writer=writer)
         print(f'### end of add: size = {self.size}')
 
@@ -208,6 +208,7 @@ class BinaryPbIndexer(BaseKVIndexer):
         print(f'### _delete: len(keys) = {len(keys)}')
         with self.get_add_handler() as writer:
             for key in keys:
+                # noinspection PyTypeChecker
                 writer.header.write(
                     np.array(
                         tuple(np.concatenate([[key], HEADER_NONE_ENTRY])),
