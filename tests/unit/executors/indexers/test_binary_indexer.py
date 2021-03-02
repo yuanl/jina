@@ -1,5 +1,6 @@
 import copy
 import os
+import time
 
 import numpy as np
 import pytest
@@ -159,3 +160,29 @@ def test_binarypb_update_twice(test_metas, delete_on_dump):
     with BaseIndexer.load(save_abspath) as idxer:
         assert idxer.query('1') == b'newvalue'
         assert idxer.query('2') == b'othernewvalue'
+
+
+# benchmark only
+@pytest.mark.skipif('GITHUB_WORKFLOW' in os.environ, reason='skip the network test on github workflow')
+@pytest.mark.parametrize('delete_on_dump', [True, False])
+def test_binarypb_benchmark(test_metas, delete_on_dump):
+    entries = 100000
+    nr_to_update = 10000
+    keys = np.arange(entries)
+    values = np.random.randint(0, 10, size=entries).astype(bytes)
+
+    with BinaryPbIndexer(metas=test_metas, delete_on_dump=delete_on_dump) as idxer:
+        idxer.add(keys, values)
+        idxer.save()
+        assert idxer.size == entries
+        save_abspath = idxer.save_abspath
+
+    new_values = np.random.randint(0, 10, size=nr_to_update).astype(bytes)
+
+    with BaseIndexer.load(save_abspath) as idxer:
+        idxer.update(keys[:nr_to_update], new_values)
+        time_now = time.time()
+        idxer.save()
+
+    time_end = time.time()
+    print(f'{delete_on_dump=}, entries={entries}. took {time_end - time_now} seconds')

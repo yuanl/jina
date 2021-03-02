@@ -73,14 +73,9 @@ class BinaryPbIndexer(BaseKVIndexer):
     def _delete_invalid_indices(self):
         if self.query_handler:
             self.query_handler.close()
-        try:
+        if self.write_handler:
             self.write_handler.flush()
-        except:
-            pass
-        try:
             self.write_handler.close()
-        except:
-            pass
 
         keys = []
         vals = []
@@ -91,7 +86,6 @@ class BinaryPbIndexer(BaseKVIndexer):
             if pos_info:
                 p, r, l = pos_info
                 with mmap.mmap(read_handler.body, offset=p, length=l) as m:
-                    print(f'found key {key} with value {m[r:]}')
                     keys.append(key)
                     vals.append(m[r:])
         read_handler.close()
@@ -149,7 +143,6 @@ class BinaryPbIndexer(BaseKVIndexer):
         self._start = 0
         self._page_size = mmap.ALLOCATIONGRANULARITY
         self.delete_on_dump = delete_on_dump
-        print(f'{delete_on_dump=}')
 
     def add(self, keys: Iterable[str], values: Iterable[bytes], *args, **kwargs) -> None:
         """Add the serialized documents to the index via document ids.
@@ -159,7 +152,7 @@ class BinaryPbIndexer(BaseKVIndexer):
         :param args: extra arguments
         :param kwargs: keyword arguments
         """
-        if not keys:
+        if not len(keys):
             return
 
         self._add(keys, values, writer=self.write_handler)
