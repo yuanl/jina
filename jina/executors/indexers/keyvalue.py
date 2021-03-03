@@ -6,7 +6,6 @@ import os
 from typing import Iterable, Optional
 
 import numpy as np
-from tensorflow.python.autograph.pyct.anno import keys
 
 from . import BaseKVIndexer
 from ..compound import CompoundExecutor
